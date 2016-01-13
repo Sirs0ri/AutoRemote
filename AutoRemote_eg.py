@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*-
 
+"""
+
+ToDo (for now)
+
+  [ ] Comment the code
+  [ ] Remove Windows-specific code
+  [ ] Remove EventGhost-dependen code
+  [ ] create a working API
+  [ ] Document the API
+
+"""
 
 import eg
 
