@@ -194,7 +194,7 @@ def createSendToShortcut(device):
     target = getEventGhostExePath()
     wDir = parentDir(getEventGhostExePath())
     icon = getEventGhostExePath()
-    arguments = "-event SentFromExplorer.To \"" + device.name +"\""
+    arguments = "-event SentFromExplorer.To \"" + device.name + "\""
 
     shell = Dispatch('WScript.Shell')
     shortcut = shell.CreateShortCut(path)
@@ -419,7 +419,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('WWW-Authenticate', 'Basic realm="%s"' % self.authRealm)
         return False
 
-    def SendContent(self, text = "OK"):
+    def SendContent(self, text="OK"):
         self.send_response(200)
         self.send_header("Content-type", 'text/plain')
         self.send_header("Content-Length", len(text))
@@ -475,7 +475,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         if response is None:
             response = ResponseNoAction(self)
 
-        response.key = communication.sender;
+        response.key = communication.sender
 
         responseJson = response.ToJson()
         self.SendContent(responseJson)
@@ -489,7 +489,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
             else:
                 import urlparse
                 parsed = urlparse.urlparse(self.path)
-                #print parsed.path
+                # print parsed.path
                 try:
                     parsedQueryString = urlparse.parse_qs(parsed.query)
                     message = parsedQueryString['message'][0]
