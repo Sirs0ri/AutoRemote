@@ -323,8 +323,8 @@ class MyServer(ThreadingMixIn, HTTPServer):
             self.socket.close()
             self.RequestHandlerClass.repeatTimer.Stop()
 
-    #def handle_error(self, request, client_address):
-    #    eg.PrintError("HTTP Error")
+    # def handle_error(self, request, client_address):
+    #     eg.PrintError("HTTP Error")
 
 
 class AutoRemotePayload:
@@ -676,7 +676,7 @@ class GoogleDrive(object):
             if fileContent is None:
                 content_file = io.FileIO(filePath, 'r')
                 fileContent = content_file.read()
-                #fileContent = "blaaa"
+                # fileContent = "blaaa"
                 content_file.close()
 
             params = json.dumps(params)
@@ -829,7 +829,7 @@ class Communication(object):
                     isLocalRequest = False
 
             if not isLocalRequest:
-                #url = 'http://localhost:8888/' + self.GetHttpEndpoint()
+                # url = 'http://localhost:8888/' + self.GetHttpEndpoint()
                 url = 'https://autoremotejoaomgcd.appspot.com/' + self.GetHttpEndpoint()
                 result = self.DoBeforeSend(egClass, url, False)
                 if result:
@@ -840,12 +840,12 @@ class Communication(object):
                         str_params_data[k] = unicode(v).encode('utf-8')
                     params = urllib.urlencode(str_params_data)
                     try:
-                        #print params
+                        # print params
                         f = urllib2.urlopen(url,str(params))
                     except Exception as e:
                         print "Couldn't make request via the internet: " + str(e)
 
-            #print params
+            # print params
             if f is not None:
                 response = f.read()
                 if isLocalRequest:
@@ -960,7 +960,7 @@ class Message(Request):
 
 
     def executeRequest(self, egClass):
-        #print self.message
+        # print self.message
         plugin = egClass.plugin
         if plugin.fileFolder == "":
             print "Can't download received files. You have to choose a folder in the AutoRemote plugin settings first."
@@ -974,7 +974,7 @@ class Message(Request):
         if self.message is not None:
             if not isinstance(self.message, unicode):
                 self.message = self.message.decode(eg.systemEncoding)
-            #print "receiving message: " + repr(self.message)
+            # print "receiving message: " + repr(self.message)
             params, seperator, commands = self.message.partition("=:=")
             if not isinstance(commands, unicode):
                 commands = commands.decode(eg.systemEncoding)
@@ -1915,14 +1915,14 @@ class AutoRemote(eg.PluginBase):
         self.server = MyServer(RequestHandler, port)
         self.server.Start()
         self.googleDriveRefreshToken = googleDriveRefreshToken
-        #for device in self.devices:
-            #createSendToShortcut(device)
+        # for device in self.devices:
+            # createSendToShortcut(device)
         define_action_on("*", "SendToEventGhost", getEventGhostExePath() + " -event SentFromExplorer.File \"%1\"", title=windowContextMenuText)
         self.googledrive = GoogleDrive(self, googleDriveRefreshToken,askForDrivePermissions)
         self.RemoteUpdgradePluginAsync()
-        #print "id: " + str(self.googledrive.GetAutoRemoteFolderId())
+        # print "id: " + str(self.googledrive.GetAutoRemoteFolderId())
 
-        #link = self.googledrive.UploadFileToAutoRemoteFolder("test", filePath = u"C:\\Users\\João\\Pictures\\Enxara com as primas\\IMG_8623.JPG")
+        # link = self.googledrive.UploadFileToAutoRemoteFolder("test", filePath = u"C:\\Users\\João\\Pictures\\Enxara com as primas\\IMG_8623.JPG")
 
         self.googledrive.Authorize()
     def RemoteUpdgradePluginAsync(self, event = None):
@@ -1977,15 +1977,15 @@ class AutoRemote(eg.PluginBase):
         self.boxsizer = wx.StaticBoxSizer(sb, wx.VERTICAL)
         self.panel.sizer.Add(self.boxsizer)
 
-    #def GetLabel(self,
-    #    prefix="HTTP",
-    #    port=1818,
-    #    name="",
-    #    devices="[]",
-    #    publicIp="",
-    #    authUsername="",
-    #    authPassword=""):
-    #    return name
+    # def GetLabel(self,
+    #     prefix="HTTP",
+    #     port=1818,
+    #     name="",
+    #     devices="[]",
+    #     publicIp="",
+    #     authUsername="",
+    #     authPassword=""):
+    #     return name
 
     def Configure(
         self,
@@ -2043,7 +2043,7 @@ class AutoRemote(eg.PluginBase):
         self.urlCtrl.Bind(wx.EVT_KILL_FOCUS, self.OnUrlChanged)
 
         self.keyCtrl = self.addLine("Device Key (Try to fill your personal URL first and this field should be automatically detected)", panel.TextCtrl())
-        #self.keyCtrl.Disable()
+        # self.keyCtrl.Disable()
 
         self.addDeviceCtrl = self.addLine(None,panel.Button("Add"))
         self.addDeviceCtrl.Bind(wx.EVT_BUTTON, self.OnAddDevice)
@@ -2149,14 +2149,14 @@ class AutoRemote(eg.PluginBase):
             self.deviceToAdd = AutoRemoteDevice(addedDeviceName, self.urlCtrl.GetValue(), self.keyCtrl.GetValue())
 
     def OnSelectedDeviceChanged(self, event):
-        #print self.devicesCtrl.GetValue()
+        # print self.devicesCtrl.GetValue()
         self.removeDeviceCtrl.Enable()
         self.tryLocalIp.Enable()
         self.deviceLocalIp.Enable()
         device = self.GetDeviceBeingManaged()
 
         if device is not None:
-            #print "OnSelectedDeviceChanged: " + str(device)
+            # print "OnSelectedDeviceChanged: " + str(device)
             self.tryLocalIp.SetValue(device.tryLocalIp)
             if device.localIp is not None:
                 self.deviceLocalIp.SetValue(device.localIp)
@@ -2167,7 +2167,7 @@ class AutoRemote(eg.PluginBase):
         device = self.GetDeviceBeingManaged()
         if device is not None:
             device.tryLocalIp = event.IsChecked()
-        #print "OnTryLocalIpChecked: " + str(device)
+        # print "OnTryLocalIpChecked: " + str(device)
 
     def OnDeviceLocalIpChanged(self, event):
         localIp = self.deviceLocalIp.GetValue()
