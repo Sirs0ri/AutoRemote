@@ -2,6 +2,32 @@
 
 
 import eg
+import datetime
+import mimetypes
+import wx
+import os
+import io
+import sys
+import posixpath
+import base64
+import time
+import urllib
+import urllib2
+import socket
+import urlparse
+from threading import Thread
+from BaseHTTPServer import HTTPServer
+from SimpleHTTPServer import SimpleHTTPRequestHandler
+from SocketServer import ThreadingMixIn
+from urllib import unquote
+from os.path import getmtime
+from win32com.client import Dispatch
+import json
+import jinja2
+import re
+import wx.lib.scrolledpanel as scrolled
+import cgi
+import _winreg
 
 eg.RegisterPlugin(
     name = "AutoRemote",
@@ -34,36 +60,6 @@ eg.RegisterPlugin(
             "+SIOf6oY+KjL2mAPlvuNthy46WDrjYO3JmupwemvqJgwA/wFagpdq+6hoCwAAAABJ"
             "RU5ErkJggg==")
 )
-
-import mmap
-import datetime
-import mimetypes
-import wx
-import os
-import io
-import sys
-import posixpath
-import base64
-import time
-import urllib
-import urllib2
-import socket
-import httplib
-import urlparse
-from threading import Thread, Event
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-from SocketServer import ThreadingMixIn
-from urllib import unquote, unquote_plus
-from os.path import getmtime
-from win32com.client import Dispatch
-import json
-import jinja2
-import cStringIO
-import re
-import  wx.lib.scrolledpanel as scrolled
-import cgi
-import _winreg
 
 pluginVersionPattern = re.compile("version = \"([^\"]+)\"")
 pythonSubstitutionPattern = re.compile('\{[^\}]+\}')
