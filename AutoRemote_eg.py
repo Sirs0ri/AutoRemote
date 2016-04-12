@@ -65,6 +65,8 @@ pluginVersionPattern = re.compile("version = \"([^\"]+)\"")
 pythonSubstitutionPattern = re.compile('\{[^\}]+\}')
 fileNameFromDownloadPattern = re.compile("filename=\"([^\"]+)\"")
 urlPattern = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
+
+
 def DownloadFile(fileUrl, folder):
     if folder is None or folder == "":
         print "Please set your AutoRemote files folder in the plugin settings."
@@ -108,6 +110,7 @@ def DownloadFile(fileUrl, folder):
     else:
         return fileUrl
 
+
 def GetLocalIp(plugin):
 
     if plugin.localIp == "":
@@ -134,6 +137,7 @@ def GetLocalIp(plugin):
         localip = plugin.localIp
     return localip
 
+
 def OnBrowseFile(event, ctrl, options=None):
     if options is None:
         options = wx.OPEN
@@ -144,11 +148,14 @@ def OnBrowseFile(event, ctrl, options=None):
         ctrl.SetValue("|".join(dialog.GetPaths()) +"|")
     dialog.Destroy()
 
+
 def parentDir(path):
     return os.path.abspath(os.path.join(path, os.pardir))
 
+
 def getEventGhostExePath():
     return parentDir(parentDir(parentDir(os.path.realpath(__file__)))) + "\EventGhost.exe"
+
 
 def define_action_on(filetype, registry_title, command, title=None):
 
@@ -174,6 +181,7 @@ def define_action_on(filetype, registry_title, command, title=None):
         _winreg.CloseKey(reg)
     except  Exception, exc:
         print "Can't add windows context menu: " + unicode(exc)
+
 
 def createSendToShortcut(device):
 
@@ -201,9 +209,11 @@ def first(list):
     except:
         pass
 
+
 def deviceByKey(plugin, key):
     device = first([(device) for device in plugin.devices if device.key == key])
     return device
+
 
 def GetFileNameFromServer(contentDisposition):
     if len(contentDisposition) > 0:
@@ -212,8 +222,10 @@ def GetFileNameFromServer(contentDisposition):
                 return fileNameFromServer[0]
     return None
 
+
 def GetSavableDevices(devices):
     return [(i.name, i.url, i.key, i.localIp, i.tryLocalIp, i.port) for i in devices]
+
 
 def SaveConfig(plugin):
     trItem = plugin.info.treeItem
@@ -231,9 +243,11 @@ def SaveConfig(plugin):
     eg.document.Save()
     print "Saved AutoRemote Configuration"
 
+
 class ScrollPanel(scrolled.ScrolledPanel):
     def __init__(self, parent):
         scrolled.ScrolledPanel.__init__(self, parent, -1)
+
 
 class FileLoader(jinja2.BaseLoader):
     """Loads templates from the file system."""
@@ -249,13 +263,13 @@ class FileLoader(jinja2.BaseLoader):
             sourceFile.close()
 
         mtime = getmtime(filename)
+
         def uptodate():
             try:
                 return getmtime(filename) == mtime
             except OSError:
                 return False
         return contents, filename, uptodate
-
 
 
 class MyServer(ThreadingMixIn, HTTPServer):
@@ -274,7 +288,6 @@ class MyServer(ThreadingMixIn, HTTPServer):
 
         HTTPServer.__init__(self, address, requestHandler)
 
-
     def server_bind(self):
         """Called by constructor to bind the socket."""
         if socket.has_ipv6 and sys.getwindowsversion()[0] > 5:
@@ -283,12 +296,10 @@ class MyServer(ThreadingMixIn, HTTPServer):
             self.socket.setsockopt(IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
         HTTPServer.server_bind(self)
 
-
     def Start(self):
         """Starts the HTTP server thread"""
         self.httpdThread = Thread(name="WebserverThread", target=self.Run)
         self.httpdThread.start()
-
 
     def Run(self):
         try:
@@ -297,7 +308,6 @@ class MyServer(ThreadingMixIn, HTTPServer):
                 self.handle_request()
         finally:
             self.httpdThread = None
-
 
     def Stop(self):
         """Stops the HTTP server thread"""
@@ -353,6 +363,7 @@ class AutoRemotePayload:
     def __repr__(self):
         return self.__str__()
 
+
 def getCommunicationFromContent(content, egClass):
     request = content
     if "request=" in content:
@@ -360,7 +371,6 @@ def getCommunicationFromContent(content, egClass):
 
     if "response=" in content:
         request = content.split("response=")[1].split("&")[0]
-
 
     #print request
     requestJsonString = request
@@ -371,6 +381,7 @@ def getCommunicationFromContent(content, egClass):
     communication = eval(type+"(egClass)")
     communication.FromJson(requestJson)
     return communication
+
 
 class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
     extensions_map = SimpleHTTPRequestHandler.extensions_map.copy()
@@ -388,7 +399,6 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         """Return the server software version string."""
         return "EventGhost/" + eg.Version.string
 
-
     def Authenticate(self):
         # only authenticate, if set
         if self.authString is None:
@@ -404,7 +414,6 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         self.send_response(401)
         self.send_header('WWW-Authenticate', 'Basic realm="%s"' % self.authRealm)
         return False
-
 
     def SendContent(self, text = "OK"):
         self.send_response(200)
@@ -467,7 +476,6 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         responseJson = response.ToJson()
         self.SendContent(responseJson)
 
-
     def do_GET(self):
 
         try:
@@ -493,16 +501,12 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         except:
             eg.PrintTraceback()
 
-
-
     def log_message(self, format, *args):
         # suppress all messages
         pass
 
-
     def copyfile(self, src, dst):
         dst.write(src.read())
-
 
     def translate_path(self, path):
         """Translate a /-separated PATH to the local filename syntax.
@@ -527,6 +531,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
                 continue
             path = os.path.join(path, word)
         return path
+
 
 class GoogleDrive(object):
     accessToken = None
@@ -657,7 +662,6 @@ class GoogleDrive(object):
 
         url = "https://www.googleapis.com/drive/v2/files"
 
-
         params = {"title": title, "description": description, "mimeType": mimeType }
         if parentFolder is not None:
             params["parents"] = [{"id": parentFolder}]
@@ -696,6 +700,7 @@ class GoogleDrive(object):
             pass
         print "Uploaded file to Google Drive: " + link
         return link
+
 
 def replacePythonCodeAndEncode(text):
     try:
