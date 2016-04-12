@@ -31,35 +31,34 @@ import wx.lib.scrolledpanel as scrolled
 from win32com.client import Dispatch
 
 eg.RegisterPlugin(
-    name = "AutoRemote",
-    author = "joaomgcd",
-    version = "1.991005",
-    guid = "{C18A174E-71E3-4C74-9A2B-8653CE9991E1}",
-    description = (
+    name="AutoRemote",
+    author="joaomgcd",
+    version="1.991005",
+    guid="{C18A174E-71E3-4C74-9A2B-8653CE9991E1}",
+    description=(
         "Send and receive messages to and from AutoRemote on Android."
     ),
-    canMultiLoad = True,
-    icon = ("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gv"
-            "aeTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH3AgXChElQdwgkgAAA2NJRE"
-            "FUOMuFkktsVGUYht9zm3Pm2pkOzPQylKGFTsWCNCrBUCuYtEhjrVQ04oY00WjcuSE"
-            "xISEKJizcGOKaeKlau6jBpAEheCm9oNQ2LdbpWNopQy8znUudc5n/nDnn/C5MSVnx"
-            "7Z/nTd73Y/CYuzg+CZgmt564R6WaWubCsVarvfdCJJ7M9D4ZEr/kHyewJY/AWNY5Y"
-            "Vs4UZbc0Q9/ntXdseZn6w/t7Vamf2EYALj52y282Nb6CHjt1xEce+EweoqUb8nLqe"
-            "L6xlqR8kE1b/B6kcxWmWrqCT85z2wClFLcnpqpUxXVo+Syie5Xu8zRiclWT2Uw00+"
-            "kd6cX1RPbYed11azJZWSDplNnr3184mtuUxBrfnpnciVzKV2QT9ngbg4OfGP8eH1k"
-            "aD2TOyK5g/0JTeow/lVlLVtaVu4vO4r3k/Hw7tY7DzugHGvplrWtbOI5j8c50H/ll"
-            "mmYbKNByo2t09/e9dqS67PcYWcpueSSSH6OKhsLllak/NjY+A5eEusfZOQGr8UdpG"
-            "AgOvgW2ynCtbSGyql+qmjZk02nz3/RwSkTN+4VatOpB20BobTHJfIM89XAlcHVvPK"
-            "Kz+uzwDFCVTiECiKDzAxilz4Jj9+PO0I7XfU2MLKs3Ihsr3jnrZ5LqX0v7WdcDpj8"
-            "6npBkInFuj0VrBcGaue+RzX3D8JtzZBnAxh19iDPR5lCdg12SYUg+CgwZM1cHQIAs"
-            "GfeP/1yY/2Oy5wggJNzqJDnEdxdB1vfAFlRwaXmoZY1RAKe4bMfvN3+elfn0uXvBh"
-            "/Ozf9w9XrDhma5wXBAaQOWJoPRCTiXD5peABvbA6pZ0B28c/jPeGR5cW71zde6rU0"
-            "Bm0ytfF6UtTcI0eELB2gwVgdZNrGWAZTYSawbTvA8D4WQZ6Zn5/sUQuq2PhyvaiRt"
-            "EboQY/JGZbyvKe6W6IJrH0P8UdDKKC2zNlyClcrn5WUNkA/s3VV+RLAzEj7j11Z6h"
-            "enhcznf/lIq3OIk3mqwLAvWKjNOgSOhgKezkE2rokPkOo8+v7xVwABAZuqnpsTCyn"
-            "tjWfGUCTYUjVR95PeIZHzir08Eh2g/1Vh7pKv96Mgm9PvdBA42N/7fweLffyB0oCO"
-            "+SIOf6oY+KjL2mAPlvuNthy46WDrjYO3JmupwemvqJgwA/wFagpdq+6hoCwAAAABJ"
-            "RU5ErkJggg==")
+    canMultiLoad=True,
+    icon=("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvae"
+          "TAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH3AgXChElQdwgkgAAA2NJREFUOM"
+          "uFkktsVGUYht9zm3Pm2pkOzPQylKGFTsWCNCrBUCuYtEhjrVQ04oY00WjcuSExISEKJ"
+          "izcGOKaeKlau6jBpAEheCm9oNQ2LdbpWNopQy8znUudc5n/nDnn/C5MSVnx7Z/nTd73"
+          "Y/CYuzg+CZgmt564R6WaWubCsVarvfdCJJ7M9D4ZEr/kHyewJY/AWNY5YVs4UZbc0Q9"
+          "/ntXdseZn6w/t7Vamf2EYALj52y282Nb6CHjt1xEce+EweoqUb8nLqeL6xlqR8kE1b/"
+          "B6kcxWmWrqCT85z2wClFLcnpqpUxXVo+Syie5Xu8zRiclWT2Uw00+kd6cX1RPbYed11"
+          "azJZWSDplNnr3184mtuUxBrfnpnciVzKV2QT9ngbg4OfGP8eH1kaD2TOyK5g/0JTeow"
+          "/lVlLVtaVu4vO4r3k/Hw7tY7DzugHGvplrWtbOI5j8c50H/llmmYbKNByo2t09/e9dq"
+          "S67PcYWcpueSSSH6OKhsLllak/NjY+A5eEusfZOQGr8UdpGAgOvgW2ynCtbSGyql+qm"
+          "jZk02nz3/RwSkTN+4VatOpB20BobTHJfIM89XAlcHVvPKKz+uzwDFCVTiECiKDzAxil"
+          "z4Jj9+PO0I7XfU2MLKs3Ihsr3jnrZ5LqX0v7WdcDpj86npBkInFuj0VrBcGaue+RzX3"
+          "D8JtzZBnAxh19iDPR5lCdg12SYUg+CgwZM1cHQIAsGfeP/1yY/2Oy5wggJNzqJDnEdx"
+          "dB1vfAFlRwaXmoZY1RAKe4bMfvN3+elfn0uXvBh/Ozf9w9XrDhma5wXBAaQOWJoPRCT"
+          "iXD5peABvbA6pZ0B28c/jPeGR5cW71zde6rU0Bm0ytfF6UtTcI0eELB2gwVgdZNrGWA"
+          "ZTYSawbTvA8D4WQZ6Zn5/sUQuq2PhyvaiRtEboQY/JGZbyvKe6W6IJrH0P8UdDKKC2z"
+          "NlyClcrn5WUNkA/s3VV+RLAzEj7j11Z6henhcznf/lIq3OIk3mqwLAvWKjNOgSOhgKe"
+          "zkE2rokPkOo8+v7xVwABAZuqnpsTCyntjWfGUCTYUjVR95PeIZHzir08Eh2g/1Vh7pK"
+          "v96Mgm9PvdBA42N/7fweLffyB0oCO+SIOf6oY+KjL2mAPlvuNthy46WDrjYO3Jmupwe"
+          "mvqJgwA/wFagpdq+6hoCwAAAABJRU5ErkJggg==")
 )
 
 pluginVersionPattern = re.compile("version = \"([^\"]+)\"")
