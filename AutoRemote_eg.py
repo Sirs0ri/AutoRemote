@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
+
 import eg
 
 eg.RegisterPlugin(
     name = "AutoRemote",
     author = "joaomgcd",
-    version = "1.991004",
+    version = "1.991005",
     guid = "{C18A174E-71E3-4C74-9A2B-8653CE9991E1}",
     description = (
         "Send and receive messages to and from AutoRemote on Android."
@@ -1749,7 +1750,7 @@ class SendNotification(eg.ActionBase):
         actionondismissCtrl = self.addLine("Action on Dismiss", wx.TextCtrl(self.spanel, -1, actionondismiss))
         cancelCtrl = self.addLine("Cancel", wx.TextCtrl(self.spanel, -1, cancel))
         persistentCtrl = self.addLine("Persistent", wx.TextCtrl(self.spanel, -1, persistent))
-        ttlCtrl = self.addLine("Time To Live", wx.TextCtrl(self.spanel, -1, cancel))
+        ttlCtrl = self.addLine("Time To Live", wx.TextCtrl(self.spanel, -1, ttl))
 
 
         while panel.Affirmed():
