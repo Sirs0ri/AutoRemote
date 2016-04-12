@@ -1,6 +1,12 @@
 
 # ToDo (for now)
 
+[ ] Make the code PEP8 compliant
+    [x] newlines
+    [ ] too long lines
+    [ ] replace "\"" with '"'
+    [ ] comments with '# '
+    [ ] .format instead of +
 [ ] Comment the code
 [ ] Remove Windows-specific code
 [ ] Remove EventGhost-dependend code
