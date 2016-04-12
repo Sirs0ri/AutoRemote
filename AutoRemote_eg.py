@@ -1,33 +1,34 @@
 # -*- coding: utf-8 -*-
 
 
-import eg
-import datetime
-import mimetypes
-import wx
-import os
-import io
-import sys
-import posixpath
 import base64
+import cgi
+import datetime
+import io
+import json
+import mimetypes
+import os
+import posixpath
+import re
+import socket
+import sys
 import time
 import urllib
 import urllib2
-import socket
 import urlparse
-from threading import Thread
 from BaseHTTPServer import HTTPServer
+from os.path import getmtime
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import ThreadingMixIn
+from threading import Thread
 from urllib import unquote
-from os.path import getmtime
-from win32com.client import Dispatch
-import json
-import jinja2
-import re
-import wx.lib.scrolledpanel as scrolled
-import cgi
+
 import _winreg
+import eg
+import jinja2
+import wx
+import wx.lib.scrolledpanel as scrolled
+from win32com.client import Dispatch
 
 eg.RegisterPlugin(
     name = "AutoRemote",
