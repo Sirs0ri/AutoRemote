@@ -121,7 +121,7 @@ def GetLocalIp(plugin):
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 s.connect(("gmail.com",80))
                 localip = s.getsockname()[0]
-                #print "Alternate " + localip
+                # print "Alternate " + localip
                 success = True
         except:
             pass
@@ -130,9 +130,9 @@ def GetLocalIp(plugin):
             localip = socket.gethostbyname(socket.gethostname())
             if not localip.startswith("127"):
                 pass
-                #print "Normal " + localip
+                # print "Normal " + localip
 
-        #print "Current local IP detected: " + localip
+        # print "Current local IP detected: " + localip
     else:
         localip = plugin.localIp
     return localip
@@ -160,15 +160,19 @@ def getEventGhostExePath():
 def define_action_on(filetype, registry_title, command, title=None):
 
     try:
-        #print "Creating " + title + " action in the Windows Context Menu (command: "+command+")"
+        # print("Creating " + title + " action in the Windows Context Menu "
+        #       "(command: " + command + ")")
         """
         define_action_on(filetype, registry_title, command, title=None)
             filetype: either an extension type (ex. ".txt") or one of the special values ("*" or "Directory"). Note that "*" is files only--if you'd like everything to have your action, it must be defined under "*" and "Directory"
             registry_title: the title of the subkey, not important, but probably ought to be relevant. If title=None, this is the text that will show up in the context menu.
         """
-        #all these opens/creates might not be the most efficient way to do it, but it was the best I could do safely, without assuming any keys were defined.
         reg = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, "Software\\Classes", 0, _winreg.KEY_SET_VALUE)
-        k1 = _winreg.CreateKey(reg, filetype) #handily, this won't delete a key if it's already there.
+        # all these opens/creates might not be the most efficient way to do it,
+        # but it was the best I could do safely, without assuming any keys were
+        # defined.
+        # handily, this won't delete a key if it's already there.
+        k1 = _winreg.CreateKey(reg, filetype)
         k2 = _winreg.CreateKey(k1, "shell")
         k3 = _winreg.CreateKey(k2, registry_title)
         k4 = _winreg.CreateKey(k3, "command")
@@ -280,7 +284,7 @@ class MyServer(ThreadingMixIn, HTTPServer):
         self.abort = False
         for res in socket.getaddrinfo(None, port, socket.AF_UNSPEC,
                               socket.SOCK_STREAM, 0, socket.AI_PASSIVE):
-            #print res
+            # print res
             self.address_family = res[0]
             self.socket_type = res[1]
             address = res[4]
@@ -372,9 +376,9 @@ def getCommunicationFromContent(content, egClass):
     if "response=" in content:
         request = content.split("response=")[1].split("&")[0]
 
-    #print request
+    # print request
     requestJsonString = request
-    #requestJsonString = unquote_plus(request)
+    # requestJsonString = unquote_plus(request)
     requestJson = json.loads(requestJsonString)
     type = requestJson.get("communication_base_params").get("type")
     print "Got communication of type: " + type
@@ -460,13 +464,13 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         """Serve a POST request."""
         # First do Basic HTTP-Authentication, if set
-        #print "do post"
-        #print self.headers
+        # print "do post"
+        # print self.headers
         contentLength = int(self.headers.get('content-length'))
         acceptEncoding = self.headers.get('accept-encoding')
         content = self.rfile.read(contentLength).decode("utf-8")
-        #print "Received " + str(content)
         communication = getCommunicationFromContent(content,self)
+        # print "Received " + str(content)
         response = communication.executeRequest(self)
         if response is None:
             response = ResponseNoAction(self)
@@ -1131,8 +1135,11 @@ class RequestSendRegistration(RequestSendRegistrationBase):
         self.publicip = publicip
         self.haswifi = True
         self.ttl = ttl
-       # self.type = "plugin"
-        #self.additional = DeviceAdditionalProperties("http://www.digitalfusionmag.com/articleimages/eventghost-logo.png", "eventghost").__dict__
+        # self.type = "plugin"
+        # self.additional = DeviceAdditionalProperties(
+        #     ("http://www.digitalfusionmag.com/articleimages/"
+        #      "eventghost-logo.png"),
+        #     "eventghost").__dict__
 
     def executeRequest(self, egClass):
         plugin = egClass.plugin
@@ -1143,7 +1150,7 @@ class RequestSendRegistration(RequestSendRegistrationBase):
         SaveConfig(plugin)
         response = RequestGetRegistration(egClass).executeRequest(egClass)
         return response
-        #print next(iter([(device) for device in plugin.devices if device.key == self.id]))
+        # print next(iter([(device) for device in plugin.devices if device.key == self.id]))
 
 
 class RequestSendRegistrations(RequestSendRegistrationBase):
@@ -1695,8 +1702,8 @@ class SendNotification(eg.ActionBase):
         notification.SetTicker(ticker).SetDismissontouch(dismissontouch).SetPriority(priority).SetNumber(number).SetContentInfo(contentInfo).SetSubtext(subtext)
         notification.SetMaxprogress(maxprogress).SetProgress(progress).SetIndeterminateprogress(indeterminateprogress).SetActionondismiss(actionondismiss).SetCancel(cancel).SetPersistent(persistent)
         notification.Send(self)
-        #notification = Notification(self, key,  name, title, text, url, channel, message, id, action, icon, led, ledOn, ledOff, picture, share, action1, action1name, action2, action2name, action3, action3name, sound)
-        #notification.Send()
+        # notification = Notification(self, key,  name, title, text, url, channel, message, id, action, icon, led, ledOn, ledOff, picture, share, action1, action1name, action2, action2name, action3, action3name, sound)
+        # notification.Send()
 
 
     def GetLabel(self, key="",  name="",title="", text="",  url="", channel="", message="", id="", action="", icon="", led="", ledOn="", ledOff="", picture="", share="", action1="", action1name="", action2="", action2name="", action3="", action3name="", sound="", statusbaricon = "", action1icon = "", action2icon = "", action3icon = "", ticker = "", dismissontouch = "", priority = "", number = "", contentInfo = "", subtext = "", maxprogress = "", progress = "", indeterminateprogress = "", actionondismiss = "", cancel = "", ttl = "", persistent = "", manualName = ""):
