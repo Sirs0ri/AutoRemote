@@ -45,7 +45,7 @@ import re
 import  wx.lib.scrolledpanel as scrolled
 import cgi
 import _winreg
-       
+
 pluginVersionPattern = re.compile("version = \"([^\"]+)\"")
 pythonSubstitutionPattern = re.compile('\{[^\}]+\}')
 fileNameFromDownloadPattern = re.compile("filename=\"([^\"]+)\"")
@@ -99,7 +99,7 @@ def GetLocalIp(plugin):
         success = False
 
         try:
-            if plugin.alernateLocalIp : 
+            if plugin.alernateLocalIp :
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 s.connect(("gmail.com",80))
                 localip = s.getsockname()[0]
@@ -111,9 +111,9 @@ def GetLocalIp(plugin):
         if not success:
             localip = socket.gethostbyname(socket.gethostname())
             if not localip.startswith("127"):
-                pass 
+                pass
                 #print "Normal " + localip
-        
+
         #print "Current local IP detected: " + localip
     else:
         localip = plugin.localIp
@@ -208,10 +208,10 @@ def SaveConfig(plugin):
     args[3] = savableDevices
 
     while len(args) < 8:
-        args.append("")        
+        args.append("")
     args[7] = plugin.googleDriveRefreshToken
 
-    eg.actionThread.Func(trItem.SetArguments)(args)       
+    eg.actionThread.Func(trItem.SetArguments)(args)
     eg.document.SetIsDirty()
     eg.document.Save()
     print "Saved AutoRemote Configuration"
@@ -300,7 +300,7 @@ class MyServer(ThreadingMixIn, HTTPServer):
 
 class AutoRemotePayload:
     def __init__(self, message, params, commands, files=[], sender="", plugin = None, messageObj = None):
-        self.armessage = message 
+        self.armessage = message
         self.arpar = params
         self.arcomm = commands
         self.files = files
@@ -391,7 +391,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         return False
 
 
-    def SendContent(self, text = "OK"):       
+    def SendContent(self, text = "OK"):
         self.send_response(200)
         self.send_header("Content-type", 'text/plain')
         self.send_header("Content-Length", len(text))
@@ -399,7 +399,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         self.wfile.write(text.encode("UTF-8"))
         self.wfile.close()
 
-    def SendFile(self, filePath):       
+    def SendFile(self, filePath):
         self.send_response(200)
         self.send_header("Content-type", 'application/octet-stream')
         self.send_header("Content-Length", len(text))
@@ -426,7 +426,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
                 environ={'REQUEST_METHOD':'POST',
                          'CONTENT_TYPE':self.headers['Content-Type'],
                         })
-            
+
             data = form.file.read()
             open(finalFilePath, "wb").write(data)
             response = ResponseFileUpload(self, finalFilePath)
@@ -455,7 +455,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
 
-        try:           
+        try:
             result = self.plugin.googledrive.HandleCallback(self.path)
             if result is not None:
                 self.SendContent(result)
@@ -528,7 +528,7 @@ class GoogleDrive(object):
         if self.askForDrivePermissions:
             print "using google drive"
             if self.refreshToken is None or self.refreshToken == "":
-                wx.LaunchDefaultBrowser("https://accounts.google.com/o/oauth2/auth?response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive&redirect_uri=http://localhost:"+str(self.plugin.port)+"&client_id=147354672683-74a5f79fdl5rnnt85mcnb0ul9k9get89.apps.googleusercontent.com&from_login=1&as=639eff90c29eec4d&pli=1&authuser=0")        
+                wx.LaunchDefaultBrowser("https://accounts.google.com/o/oauth2/auth?response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive&redirect_uri=http://localhost:"+str(self.plugin.port)+"&client_id=147354672683-74a5f79fdl5rnnt85mcnb0ul9k9get89.apps.googleusercontent.com&from_login=1&as=639eff90c29eec4d&pli=1&authuser=0")
         else:
             print "not using google drive"
 
@@ -569,7 +569,7 @@ class GoogleDrive(object):
             self.accessToken = responseJson.get("access_token")
             expiresIn = responseJson.get("expires_in")
             self.expirationDate = datetime.datetime.now() + datetime.timedelta(seconds = int(expiresIn))
-       
+
         return self.accessToken
 
     def ResetAccessToken(self):
@@ -609,7 +609,7 @@ class GoogleDrive(object):
         request = urllib2.Request(url, data, headers= {"Authorization" : "Bearer " + self.GetAccessToken(), "Content-Type": "application/json"})
         f = urllib2.urlopen(request)
         response = f.read()
-    
+
     def UploadFileToAutoRemoteFolder(self, title, description = None, mimeType = None, filePath = None, fileContent = None):
         return self.UploadFile(title,description,mimeType, filePath, fileContent, self.GetAutoRemoteFolderId())
 
@@ -624,7 +624,7 @@ class GoogleDrive(object):
         response = f.read()
         responseJson = json.loads(response)
         return responseJson["id"]
-    
+
     def UploadFile(self, title, description = None, mimeType = None, filePath = None, fileContent = None, parentFolder = None):
         title = title.encode("utf-8")
         filePath = filePath.encode("utf-8")
@@ -659,7 +659,7 @@ class GoogleDrive(object):
             params = json.dumps(params)
             contentType = 'multipart/related; boundary="'+boundary+'"'
             data = "--" + boundary + "\nContent-Type: application/json; charset=UTF-8\n\n" + params + "\n\n" + "--" + boundary + "\nContent-Type: "+mimeType+"\n\n" + fileContent + "\n\n--" + boundary + "--"
-          
+
         else:
             contentType = "application/json"
             data = json.dumps(params)
@@ -693,7 +693,7 @@ def replacePythonCodeAndEncode(text):
     return text
 
 
-class Communication(object):    
+class Communication(object):
 
     key = None
     sender = None
@@ -720,8 +720,8 @@ class Communication(object):
 
     def GetParamsGCM(self):
         return {"request":self.GetParams(), "key":self.key, "sender":self.sender}
-    
-    
+
+
     def SendFiles(self, egClass, files, url, isLocalRequest):
         import urllib2
         filesRemotePaths = []
@@ -773,7 +773,7 @@ class Communication(object):
             print "Error sending files " + str(files) + ": " + str(err)
 
         return ",".join(filesRemotePaths)
-    
+
     def Send(self, egClass):
         Thread(target = self.SendSync, args=(egClass,)).start()
 
@@ -801,9 +801,9 @@ class Communication(object):
                         isLocalRequest = False
                 except Exception as e:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
-                    print str(exc_tb.tb_lineno) + ": Couldn't make request via local network: " + str(e)  
+                    print str(exc_tb.tb_lineno) + ": Couldn't make request via local network: " + str(e)
                     isLocalRequest = False
-            
+
             if not isLocalRequest:
                 #url = 'http://localhost:8888/' + self.GetHttpEndpoint()
                 url = 'https://autoremotejoaomgcd.appspot.com/' + self.GetHttpEndpoint()
@@ -819,7 +819,7 @@ class Communication(object):
                         #print params
                         f = urllib2.urlopen(url,str(params))
                     except Exception as e:
-                        print "Couldn't make request via the internet: " + str(e)  
+                        print "Couldn't make request via the internet: " + str(e)
 
             #print params
             if f is not None:
@@ -884,7 +884,7 @@ class Response(Communication):
         return 'sendresponse'
 
     def handleResponse(self, egClass):
-        pass 
+        pass
 
 class ResponseNoAction(Response):
 
@@ -929,7 +929,7 @@ class Message(Request):
                 return False
         else:
             self.files = ""
-            return True        
+            return True
 
     def downloadFile(self, fileUrl, folder):
         return DownloadFile(fileUrl, folder)
@@ -945,16 +945,16 @@ class Message(Request):
                 print "Files: " + str(self.files)
                 self.files = self.files.split(',')
                 self.files = [self.downloadFile(file, plugin.fileFolder) for file in self.files]
-                
+
         event = "Message"
         if self.message is not None:
-            if not isinstance(self.message, unicode): 
+            if not isinstance(self.message, unicode):
                 self.message = self.message.decode(eg.systemEncoding)
             #print "receiving message: " + repr(self.message)
             params, seperator, commands = self.message.partition("=:=")
-            if not isinstance(commands, unicode): 
+            if not isinstance(commands, unicode):
                 commands = commands.decode(eg.systemEncoding)
-            if not isinstance(params, unicode): 
+            if not isinstance(params, unicode):
                 params = params.decode(eg.systemEncoding)
             params = params.split(" ")
             if "=:=" in commands:
@@ -985,7 +985,7 @@ class SendMessage(eg.ActionBase):
     name = "Send Message"
     description = "Send a message to your Android device"
     def __call__(self,  name="", url="", key="", text="", ttl="", password="", target="", channel="", files="", manualName =""):
-        
+
         manualName =  replacePythonCodeAndEncode(manualName)
         if manualName != "":
             for device in self.plugin.devices:
@@ -995,42 +995,42 @@ class SendMessage(eg.ActionBase):
 
         message = Message(self, key,text,ttl,password,target,files)
         message.Send(self)
-        
+
 
 
     def GetLabel(self,  name="", url="", key="",  message="", ttl="", password="", target="", channel="", files="", manualName =""):
         return "Sending " + message + " to " + name
 
-        
+
     def Configure(self,  name="", url="", key="",  message="", ttl="", password="", target="", channel="", files="", manualName =""):
         panel = eg.ConfigPanel(self)
-        
+
         self.devicesCtrl = panel.Choice(0, [])
         panel.AddLine("Device:", self.devicesCtrl)
 
         for device in self.plugin.devices:
             self.devicesCtrl.Append(device.name)
-    
+
         if name != "":
             self.devicesCtrl.SetStringSelection(name)
         else:
             self.devicesCtrl.SetSelection(0);
-        
+
         self.deviceNameCtrl = panel.TextCtrl(manualName)
         panel.AddLine("Device Name (will override the above selected device):", self.deviceNameCtrl)
 
         messageCtrl = panel.TextCtrl(message)
         panel.AddLine("Message:", messageCtrl)
-        
+
         ttlCtrl = panel.TextCtrl(ttl)
         panel.AddLine("Time To Live:", ttlCtrl)
-        
+
         targetCtrl = panel.TextCtrl(target)
         panel.AddLine("Target:", targetCtrl)
-        
+
         passwordCtrl = panel.TextCtrl(password)
         panel.AddLine("Password:", passwordCtrl)
-        
+
         self.filesCtrl = panel.TextCtrl(files)
         panel.AddLine("Files (separate by comma or vertical bar (, or |)):", self.filesCtrl)
 
@@ -1038,10 +1038,10 @@ class SendMessage(eg.ActionBase):
         panel.AddLine("Browse Files:", filesButtonCtrl)
         filesButtonCtrl.Bind(wx.EVT_BUTTON, self.OnBrowseFiles)
 
-        
+
         while panel.Affirmed():
             selectedDevice = self.GetSelectedDevice()
-        
+
 
             panel.SetResult(
                 selectedDevice.name,
@@ -1053,10 +1053,10 @@ class SendMessage(eg.ActionBase):
                 targetCtrl.GetValue(),
                 "",
                 self.filesCtrl.GetValue(),
-                self.deviceNameCtrl.GetValue()               
+                self.deviceNameCtrl.GetValue()
             )
-    
-    
+
+
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
@@ -1070,7 +1070,7 @@ def registerDevice(plugin, deviceToRegister):
     try:
         device = deviceByKey(plugin, deviceToRegister.id)
         device.localIp = deviceToRegister.localip
-        device.port = deviceToRegister.port            
+        device.port = deviceToRegister.port
         print "Device already registered. Updating properties: " + str(device)
     except:
         device = AutoRemoteDevice(deviceToRegister.name, "", deviceToRegister.id, deviceToRegister.localip, True, deviceToRegister.port)
@@ -1124,7 +1124,7 @@ class RequestSendRegistration(RequestSendRegistrationBase):
         response = RequestGetRegistration(egClass).executeRequest(egClass)
         return response
         #print next(iter([(device) for device in plugin.devices if device.key == self.id]))
-       
+
 
 class RequestSendRegistrations(RequestSendRegistrationBase):
     devices = []
@@ -1136,8 +1136,8 @@ class RequestSendRegistrations(RequestSendRegistrationBase):
         plugin = egClass.plugin
         print "Received Multiple Registrations: " + str([device['name'] for device in self.devices])
         for receivedDevice in self.devices:
-            device = RequestSendRegistration(egClass) 
-            device.FromDict(receivedDevice)           
+            device = RequestSendRegistration(egClass)
+            device.FromDict(receivedDevice)
             self.registerDevice(plugin, device)
 
         SaveConfig(plugin)
@@ -1149,15 +1149,15 @@ class RequestGetRegistration(Request):
         super(RequestGetRegistration, self).__init__(egClass, key)
 
     def executeRequest(self, egClass):
-        plugin = egClass.plugin        
-        localip = GetLocalIp(egClass.plugin)    
+        plugin = egClass.plugin
+        localip = GetLocalIp(egClass.plugin)
 
         port = str(plugin.port)
         publicIp = GetPublicIp(plugin)
         return ResponseGetRegistration(egClass, localip, publicIp, port)
 
-class ResponseGetRegistration(Response):    
-    
+class ResponseGetRegistration(Response):
+
     id = None
     type = None
     name = None
@@ -1176,12 +1176,12 @@ class ResponseGetRegistration(Response):
         self.publicip = publicip
         self.haswifi = True
 
-    def handleResponse(self, egClass):   
-       plugin = egClass.plugin     
+    def handleResponse(self, egClass):
+       plugin = egClass.plugin
        registerDevice(plugin, self)
 
-class ResponseBasic(Response):    
-    
+class ResponseBasic(Response):
+
     result= None
 
     def __init__(self, egClass, result = ""):
@@ -1189,13 +1189,13 @@ class ResponseBasic(Response):
         self.result = result
 
 
-class ResponseFileUpload(Response):    
-    
+class ResponseFileUpload(Response):
+
     path = None
 
     def __init__(self, egClass, path=""):
         super(ResponseFileUpload, self).__init__(egClass, egClass.plugin.dname)
-        self.path = path          
+        self.path = path
 
 class RequestVersion(Request):
 
@@ -1209,8 +1209,8 @@ class RequestVersion(Request):
         print "Replying with version " + responseVersion.version
         return responseVersion
 
-class ResponseVersion(Response):    
-    
+class ResponseVersion(Response):
+
     version = None
 
     def __init__(self, egClass):
@@ -1226,7 +1226,7 @@ class RequestUpdatePlugin(Message):
 
     def executeRequest(self, egClass):
         plugin = egClass.plugin
-        
+
         print "Upgrading to version " + self.version
         self.files = self.files.split(',')
         fromFile = self.files[0]
@@ -1242,13 +1242,13 @@ class RequestGetLaterURLs(Request):
     def executeRequest(self, egClass):
         pass
 
-class RequestReturnLaterURLs(Request):    
-    
+class RequestReturnLaterURLs(Request):
+
     urls=[]
 
     def __init__(self, egClass):
         super(RequestReturnLaterURLs, self).__init__(egClass, egClass.plugin.dname)
-       
+
     def executeRequest(self, egClass):
         for url in self.urls:
             print "Opening " + url  + "..."
@@ -1274,38 +1274,38 @@ def GetPublicIp(plugin):
 
 
 class RegisterEventGhost(eg.ActionBase):
-    name = "Register EventGhost"  
+    name = "Register EventGhost"
     description = "Register or refresh EventGhost info on your Android device. Recommended use is at user login and on EventGhost startup."
 
     def __call__(self,  name="", url="",key="", ttl=""):
-        
+
         localip = GetLocalIp(self.plugin)
         port = str(self.plugin.port)
         publicIp = GetPublicIp(self.plugin)
 
         registration = RequestSendRegistration(self, key, localip, publicIp, port, ttl)
         registration.Send(self)
-    
+
 
     def GetLabel(self,  name="", url="",key="", ttl=""):
         return "Registering on " + name
-        
+
     def Configure(self,  name="", url="", key="", ttl=""):
         panel = eg.ConfigPanel(self)
-        
+
         self.devicesCtrl = panel.Choice(0, [])
         panel.sizer.Add(panel.StaticText("Device:"), 1, wx.EXPAND)
         panel.sizer.Add(self.devicesCtrl, 1, wx.EXPAND)
         for device in self.plugin.devices:
             self.devicesCtrl.Append(device.name)
-            
+
         self.devicesCtrl.SetStringSelection(name)
-        
+
 
         ttlCtrl = panel.TextCtrl(ttl)
         panel.AddLine("Time To Live:", ttlCtrl)
-        
-        
+
+
         while panel.Affirmed():
             selectedDevice = self.GetSelectedDevice()
             panel.SetResult(
@@ -1315,38 +1315,38 @@ class RegisterEventGhost(eg.ActionBase):
                 ttlCtrl.GetValue()
             )
 
-    
+
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
                 return device
 
 class GetLaterUrls(eg.ActionBase):
-    name = "Get Later URLs"  
+    name = "Get Later URLs"
     description = "Get the URLs that were stored as Send For Later on your Android device."
 
     def __call__(self,  name="", key=""):
-        
-        
+
+
         request = RequestGetLaterURLs(self, key)
         request.Send(self)
-    
+
 
     def GetLabel(self,  name="", url="",key=""):
         return "Get Later URLs on " + name
-        
+
     def Configure(self,  name="", url="", key=""):
         panel = eg.ConfigPanel(self)
-        
+
         self.devicesCtrl = panel.Choice(0, [])
         panel.sizer.Add(panel.StaticText("Device:"), 1, wx.EXPAND)
         panel.sizer.Add(self.devicesCtrl, 1, wx.EXPAND)
         for device in self.plugin.devices:
             self.devicesCtrl.Append(device.name)
-            
-        self.devicesCtrl.SetStringSelection(name)        
-        
-        
+
+        self.devicesCtrl.SetStringSelection(name)
+
+
         while panel.Affirmed():
             selectedDevice = self.GetSelectedDevice()
             panel.SetResult(
@@ -1354,19 +1354,19 @@ class GetLaterUrls(eg.ActionBase):
                 selectedDevice.key
             )
 
-    
+
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
                 return device
 
 class ShowInputDialog(eg.ActionBase):
-    name = "Show Input Dialog"  
+    name = "Show Input Dialog"
     description = "Show an input dialog that allows you to create an EventGhost event that you can then use to trigger AutoRemote messages or notifications"
 
     def __call__(self,  dialogTitle="", dialogText="", textBoxText="", eventName="", useTextForEvent=False):
-        
-        
+
+
         class MyDialog():
             def __init__(self):
                 dlg = wx.TextEntryDialog(None, eg.ParseString(dialogText),eg.ParseString(dialogTitle), textBoxText)
@@ -1380,30 +1380,30 @@ class ShowInputDialog(eg.ActionBase):
                     eg.TriggerEvent("Input.CANCEL")
                 dlg.Destroy()
         wx.CallAfter(MyDialog)
-    
+
 
     def GetLabel(self,  dialogTitle="", dialogText="", textBoxText="", eventName="", useTextForEvent=False):
         return "Show input dialog: " + dialogTitle
-        
+
     def Configure(self,  dialogTitle="Input some text", dialogText="Your text", textBoxText="", eventName="TextInput", useTextForEvent=False):
         panel = eg.ConfigPanel(self)
-        
+
         dialogTitleCtrl = panel.TextCtrl(dialogTitle)
-        panel.AddLine("Dialog Title:", dialogTitleCtrl)  
-        
+        panel.AddLine("Dialog Title:", dialogTitleCtrl)
+
         dialogTextCtrl = panel.TextCtrl(dialogText)
-        panel.AddLine("Dialog Text:", dialogTextCtrl) 
-        
+        panel.AddLine("Dialog Text:", dialogTextCtrl)
+
         textBoxTextCtrl = panel.TextCtrl(textBoxText)
-        panel.AddLine("Text Box Text:", textBoxTextCtrl)  
-        
+        panel.AddLine("Text Box Text:", textBoxTextCtrl)
+
         eventNameCtrl = panel.TextCtrl(eventName)
-        panel.AddLine("Event Name:", eventNameCtrl)  
-        
+        panel.AddLine("Event Name:", eventNameCtrl)
+
         useTextForEventCtrl = panel.CheckBox(useTextForEvent)
-        panel.AddLine("Use Input Text In Event Name:", useTextForEventCtrl)  
-        
-        
+        panel.AddLine("Use Input Text In Event Name:", useTextForEventCtrl)
+
+
         while panel.Affirmed():
             panel.SetResult(
                 dialogTitleCtrl.GetValue(),
@@ -1413,7 +1413,7 @@ class ShowInputDialog(eg.ActionBase):
                 useTextForEventCtrl.GetValue()
             )
 
-    
+
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
@@ -1483,13 +1483,13 @@ class Notification(Request):
         self.action3 = replacePythonCodeAndEncode(action3)
         self.action3name = replacePythonCodeAndEncode(action3name)
         self.sound = replacePythonCodeAndEncode(sound)
-    
+
     def executeRequest(self, egClass):
         message = Message(egClass)
         message.message = self.message
         message.sender = self.sender
         message.executeRequest(egClass)
-    
+
 
     def DoBeforeSend(self, egClass, url, isLocalRequest):
         super(Notification, self).DoBeforeSend(egClass,url, isLocalRequest)
@@ -1505,9 +1505,9 @@ class Notification(Request):
             picture = self.SendFiles(egClass,  [self.picture], url, isLocalRequest)
             if len(picture) > 0:
                 self.picture = picture
-            else:   
+            else:
                 result = False
-            
+
         return result
 
     def SetTitle(self, value):
@@ -1593,74 +1593,74 @@ class Notification(Request):
     def SetStatusbaricon(self, value):
         self.statusbaricon = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetAction1icon(self, value):
         self.action1icon = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetAction2icon(self, value):
         self.action2icon = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetAction3icon(self, value):
         self.action3icon = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetTicker(self, value):
         self.ticker = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetDismissontouch(self, value):
         self.dismissontouch = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetPriority(self, value):
         self.priority = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetNumber(self, value):
         self.number = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetContentInfo(self, value):
         self.contentInfo = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetSubtext(self, value):
         self.subtext = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetMaxprogress(self, value):
         self.maxprogress = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetProgress(self, value):
         self.progress = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetIndeterminateprogress(self, value):
         self.indeterminateprogress = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetActionondismiss(self, value):
         self.actionondismiss = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetCancel(self, value):
         self.cancel = replacePythonCodeAndEncode(value)
         return self
-        
+
     def SetPersistent(self, value):
         self.persistent = replacePythonCodeAndEncode(value)
         return self
-        
+
 
 class SendNotification(eg.ActionBase):
-    name = "Send Notification"  
+    name = "Send Notification"
     description = "Send a notification"
 
     def __call__(self, key="",  name="", title="", text="", url="", channel="", message="", id="", action="", icon="", led="", ledOn="", ledOff="", picture="", share="", action1="", action1name="", action2="", action2name="", action3="", action3name="", sound="", statusbaricon = "", action1icon = "", action2icon = "", action3icon = "", ticker = "", dismissontouch = "", priority = "", number = "", contentInfo = "", subtext = "", maxprogress = "", progress = "", indeterminateprogress = "", actionondismiss = "", cancel = "", ttl = "", persistent = "", manualName = ""):
-        
+
         if manualName != "":
             for device in self.plugin.devices:
                 if device.name == manualName:
@@ -1681,7 +1681,7 @@ class SendNotification(eg.ActionBase):
 
     def GetLabel(self, key="",  name="",title="", text="",  url="", channel="", message="", id="", action="", icon="", led="", ledOn="", ledOff="", picture="", share="", action1="", action1name="", action2="", action2name="", action3="", action3name="", sound="", statusbaricon = "", action1icon = "", action2icon = "", action3icon = "", ticker = "", dismissontouch = "", priority = "", number = "", contentInfo = "", subtext = "", maxprogress = "", progress = "", indeterminateprogress = "", actionondismiss = "", cancel = "", ttl = "", persistent = "", manualName = ""):
         return "Sending Notification"
-    
+
     def addLine(self, label, control):
         if(label is not None):
             self.sizer.Add(wx.StaticText(self.spanel,-1,label+":"),0,wx.TOP,3)
@@ -1702,7 +1702,7 @@ class SendNotification(eg.ActionBase):
         self.devicesCtrl = self.addLine("Device", wx.Choice(self.spanel, -1))
         for device in self.plugin.devices:
             self.devicesCtrl.Append(device.name)
-        if name != "":            
+        if name != "":
             self.devicesCtrl.SetStringSelection(name)
         elif len(self.plugin.devices) > 0:
             self.devicesCtrl.SetSelection(0)
@@ -1751,7 +1751,7 @@ class SendNotification(eg.ActionBase):
         persistentCtrl = self.addLine("Persistent", wx.TextCtrl(self.spanel, -1, persistent))
         ttlCtrl = self.addLine("Time To Live", wx.TextCtrl(self.spanel, -1, cancel))
 
-        
+
         while panel.Affirmed():
             selectedDevice = self.GetSelectedDevice()
             panel.SetResult(
@@ -1775,7 +1775,7 @@ class SendNotification(eg.ActionBase):
                 action2Ctrl.GetValue(),
                 action2nameCtrl.GetValue(),
                 action3Ctrl.GetValue(),
-                action3nameCtrl.GetValue(), 
+                action3nameCtrl.GetValue(),
                 soundCtrl.GetValue(),
                 statusbariconCtrl.GetValue(),
                 action1iconCtrl.GetValue(),
@@ -1797,7 +1797,7 @@ class SendNotification(eg.ActionBase):
                 self.deviceNameCtrl.GetValue()
             )
 
-        
+
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
@@ -1830,7 +1830,7 @@ class AutoRemote(eg.PluginBase):
         self.AddAction(RegisterEventGhost)
         self.AddAction(SendNotification)
         self.AddAction(GetLaterUrls)
-        self.AddAction(ShowInputDialog)       
+        self.AddAction(ShowInputDialog)
         self.running = False
 
 
@@ -1868,7 +1868,7 @@ class AutoRemote(eg.PluginBase):
         RequestHandler.authString = authString
 
         if len(devices) > 0:
-            if(isinstance(devices[0], AutoRemoteDevice)):          
+            if(isinstance(devices[0], AutoRemoteDevice)):
                 self.devices = devices
                 wx.CallAfter(self.SaveConfig, devices)
             else:
@@ -1896,11 +1896,11 @@ class AutoRemote(eg.PluginBase):
         #print "id: " + str(self.googledrive.GetAutoRemoteFolderId())
 
         #link = self.googledrive.UploadFileToAutoRemoteFolder("test", filePath = u"C:\\Users\\João\\Pictures\\Enxara com as primas\\IMG_8623.JPG")
-       
+
         self.googledrive.Authorize()
     def RemoteUpdgradePluginAsync(self, event = None):
         Thread(target = self.RemoteUpdgradePlugin).start()
-        
+
     def RemoteUpdgradePlugin(self):
         try:
             versionFromWeb = urllib2.urlopen("https://dl.dropboxusercontent.com/u/9787157/AutoRemote/egversion").read()
@@ -1908,7 +1908,7 @@ class AutoRemote(eg.PluginBase):
             if float(remoteVersion) > float(self.info.version):
                 print "AutoRemote plugin Remote version " + remoteVersion + " > Local Version " + self.info.version  + ". Upgrading..."
                 filePath = DownloadFile("https://dl.dropboxusercontent.com/u/9787157/AutoRemote/__init__.py", self.fileFolder)
-                if filePath is not None:                    
+                if filePath is not None:
                     eg.TriggerEvent("AutoRemote.Updated");
                     print "Downloaded remote version to " + filePath
                     UpdatePlugin(filePath)
@@ -1927,7 +1927,7 @@ class AutoRemote(eg.PluginBase):
         trItem = self.info.treeItem
         args = list(trItem.GetArguments())
         args[3] = [(i.name, i.url, i.key) for i in self.devices]
-        eg.actionThread.Func(trItem.SetArguments)(args)       
+        eg.actionThread.Func(trItem.SetArguments)(args)
         eg.document.SetIsDirty()
         eg.document.Save()
         print "Sucessfully converted to non-bugged-save version"
@@ -1981,7 +1981,7 @@ class AutoRemote(eg.PluginBase):
     ):
         text = self.text
         panel = eg.ConfigPanel()
-        
+
         self.panel = panel
         self.spanel = ScrollPanel(panel)
         self.spanel.SetupScrolling()
@@ -2005,25 +2005,25 @@ class AutoRemote(eg.PluginBase):
         self.systemLogsCtrl = self.addLine(None, panel.CheckBox(systemLogs,label="Show all logs (disable if you want less AutoRemote logs to show up; important ones will still show.)"))
         self.windowsContextMenuCtrl = self.addLine("Windows Context Menu Text", panel.TextCtrl(windowContextMenuText))
         self.autoAskForDrivePermissionsCtrl = self.addLine(None, panel.CheckBox(askForDrivePermissions,label="Use Google Drive so you can easily transfer files to your Android Device"))
-        
+
 
         self.addGroup("Add Device")
 
         self.deviceCtrl = self.addLine("Device Name", panel.TextCtrl())
-        self.deviceCtrl.Bind(wx.EVT_KILL_FOCUS, self.OnNameChanged)  
+        self.deviceCtrl.Bind(wx.EVT_KILL_FOCUS, self.OnNameChanged)
 
         self.urlCtrl = self.addLine("Device Personal URL (e.g. goo.gl/XxXxX)", panel.TextCtrl())
-        self.urlCtrl.Bind(wx.EVT_KILL_FOCUS, self.OnUrlChanged) 
-            
+        self.urlCtrl.Bind(wx.EVT_KILL_FOCUS, self.OnUrlChanged)
+
         self.keyCtrl = self.addLine("Device Key (Try to fill your personal URL first and this field should be automatically detected)", panel.TextCtrl())
         #self.keyCtrl.Disable()
 
         self.addDeviceCtrl = self.addLine(None,panel.Button("Add"))
         self.addDeviceCtrl.Bind(wx.EVT_BUTTON, self.OnAddDevice)
         self.addDeviceCtrl.Disable()
-        
+
         if len(devices) > 0:
-                if(isinstance(devices[0], AutoRemoteDevice)):            
+                if(isinstance(devices[0], AutoRemoteDevice)):
                     self.cdevices = devices
                 else:
                     self.cdevices = [AutoRemoteDevice(*i) for i in devices]
@@ -2065,7 +2065,7 @@ class AutoRemote(eg.PluginBase):
                 localIpCtrl.GetValue(),
                 self.autoAskForDrivePermissionsCtrl.GetValue()
             )
-            
+
     def OnAddDevice(self, event):
         self.GetDeviceFromInput()
         self.cdevices.append(self.deviceToAdd)
@@ -2074,7 +2074,7 @@ class AutoRemote(eg.PluginBase):
             self.devicesCtrl.SetSelection ( 0 )
         self.addDeviceCtrl.Disable()
 
-    def OnBrowseFolder(self, event):        
+    def OnBrowseFolder(self, event):
         dialog = wx.DirDialog(None, "Choose a directory:",style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
             self.folderNameCtrl.SetValue(dialog.GetPath())
@@ -2090,37 +2090,37 @@ class AutoRemote(eg.PluginBase):
             self.tryLocalIp.SetValue(False)
             self.deviceLocalIp.Disable()
             self.deviceLocalIp.SetValue("")
-        
+
     def OnUrlChanged(self, event):
         self.UpdateButton()
-        
+
     def OnNameChanged(self, event):
         self.UpdateButton()
-            
+
     def UpdateButton(self):
         self.GetDeviceFromInput()
         self.keyCtrl.SetValue(self.deviceToAdd.key)
-        found = False        
+        found = False
         if self.deviceToAdd.key != "Invalid URL":
             for device in self.cdevices:
                 if device.name == self.deviceCtrl.GetValue():
                     found = True
                     break
-        
+
         if found:
             self.addDeviceCtrl.Disable()
             self.addDeviceCtrl.SetLabel("Name already exists")
         else:
             self.addDeviceCtrl.SetLabel("Add")
             self.addDeviceCtrl.Enable()
-        
+
     def GetDeviceFromInput(self):
         addedDeviceName = self.deviceCtrl.GetValue()
         if self.keyCtrl.GetValue() == "" or self.keyCtrl.GetValue() == "Invalid URL":
             self.deviceToAdd =  AutoRemoteDevice(addedDeviceName, self.urlCtrl.GetValue())
         else:
             self.deviceToAdd = AutoRemoteDevice(addedDeviceName, self.urlCtrl.GetValue(), self.keyCtrl.GetValue())
-        
+
     def OnSelectedDeviceChanged(self, event):
         #print self.devicesCtrl.GetValue()
         self.removeDeviceCtrl.Enable()
@@ -2155,9 +2155,9 @@ class AutoRemote(eg.PluginBase):
         except:
             return None
 
-        
+
 class AutoRemoteDevice:
-    
+
     name = None
     url = None
     key = None
@@ -2172,8 +2172,8 @@ class AutoRemoteDevice:
         self.localIp = localIp
         self.tryLocalIp = tryLocalIp
         self.port = port
-    
-    def __str__(self): 
+
+    def __str__(self):
         result = "\n\tkey: " + repr(self.key)
         result += "\n\tname: " + repr(self.name)
         result += "\n\turl: " + repr(self.url)
@@ -2202,4 +2202,3 @@ class AutoRemoteDevice:
                 return "Invalid URL"
         else:
             return "Invalid URL"
-
