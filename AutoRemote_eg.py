@@ -232,18 +232,18 @@ def first(aList):
 
 def deviceByKey(plugin, key):
     device = first([(device) for device
-                   in plugin.devices
-                   if device.key == key])
+                    in plugin.devices
+                    if device.key == key])
     return device
 
 
 def GetFileNameFromServer(contentDisposition):
     if len(contentDisposition) > 0:
-            fileNameFromServer = fileNameFromDownloadPattern \
-                                     .search(contentDisposition) \
-                                     .groups(1)
-            if fileNameFromServer is not None:
-                return fileNameFromServer[0]
+        fileNameFromServer = fileNameFromDownloadPattern \
+                                 .search(contentDisposition) \
+                                 .groups(1)
+        if fileNameFromServer is not None:
+            return fileNameFromServer[0]
     return None
 
 
@@ -305,7 +305,8 @@ class MyServer(ThreadingMixIn, HTTPServer):
         self.httpdThread = None
         self.abort = False
         for res in socket.getaddrinfo(None, port, socket.AF_UNSPEC,
-                              socket.SOCK_STREAM, 0, socket.AI_PASSIVE):
+                                      socket.SOCK_STREAM, 0,
+                                      socket.AI_PASSIVE):
             # print res
             self.address_family = res[0]
             self.socket_type = res[1]
@@ -654,10 +655,9 @@ class GoogleDrive(object):
             responseJson = json.loads(response)
             self.accessToken = responseJson.get("access_token")
             expiresIn = responseJson.get("expires_in")
-            self.expirationDate = (datetime.datetime.now() +
-                                   datetime.timedelta(
-                                       seconds = int(expiresIn)))
-                                       # TODO This as well.
+            self.expirationDate = (
+                datetime.datetime.now() + datetime.timedelta(
+                    seconds=int(expiresIn)))
 
         return self.accessToken
 
@@ -1259,7 +1259,7 @@ def registerDevice(plugin, deviceToRegister):
 class RequestSendRegistrationBase(Request):
 
     def registerDevice(self, plugin, deviceToRegister):
-       registerDevice(plugin, deviceToRegister)
+        registerDevice(plugin, deviceToRegister)
 
 
 class DeviceAdditionalProperties(object):
@@ -1307,7 +1307,8 @@ class RequestSendRegistration(RequestSendRegistrationBase):
         SaveConfig(plugin)
         response = RequestGetRegistration(egClass).executeRequest(egClass)
         return response
-        # print next(iter([(device) for device in plugin.devices if device.key == self.id]))
+        # print (next(iter([(device) for device in plugin.devices
+        #                   if device.key == self.id])))
 
 
 class RequestSendRegistrations(RequestSendRegistrationBase):
@@ -1364,8 +1365,8 @@ class ResponseGetRegistration(Response):
         self.haswifi = True
 
     def handleResponse(self, egClass):
-       plugin = egClass.plugin
-       registerDevice(plugin, self)
+        plugin = egClass.plugin
+        registerDevice(plugin, self)
 
 
 class ResponseBasic(Response):
@@ -1991,9 +1992,10 @@ class SendNotification(eg.ActionBase):
         iconFileButtonCtrl.Bind(
             wx.EVT_BUTTON, self.OnBrowseFileIcon)
         ledCtrl = self.addLine(
-            "Led Color", wx.Choice(self.spanel, -1, (-1, -1), (-1, -1),
-            ['red', 'blue', 'green', 'black', 'white', 'gray', 'cyan',
-             'magenta', 'yellow', 'lightgray', 'darkgray']))
+            "Led Color", wx.Choice(
+                self.spanel, -1, (-1, -1), (-1, -1),
+                ['red', 'blue', 'green', 'black', 'white', 'gray', 'cyan',
+                 'magenta', 'yellow', 'lightgray', 'darkgray']))
         ledOnCtrl = self.addLine(
             "Led On Time", wx.TextCtrl(self.spanel, -1, ledOn))
         ledOffCtrl = self.addLine(
@@ -2177,7 +2179,7 @@ class AutoRemote(eg.PluginBase):
         self.server.Start()
         self.googleDriveRefreshToken = googleDriveRefreshToken
         # for device in self.devices:
-            # createSendToShortcut(device)
+        #     createSendToShortcut(device)
         define_action_on(
             "*", "SendToEventGhost",
             getEventGhostExePath() + " -event SentFromExplorer.File \"%1\"",
@@ -2348,10 +2350,10 @@ class AutoRemote(eg.PluginBase):
         self.addDeviceCtrl.Disable()
 
         if len(devices) > 0:
-                if(isinstance(devices[0], AutoRemoteDevice)):
-                    self.cdevices = devices
-                else:
-                    self.cdevices = [AutoRemoteDevice(*i) for i in devices]
+            if isinstance(devices[0], AutoRemoteDevice):
+                self.cdevices = devices
+            else:
+                self.cdevices = [AutoRemoteDevice(*i) for i in devices]
         else:
             self.cdevices = []
 
