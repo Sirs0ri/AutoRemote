@@ -452,7 +452,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
                 fp=self.rfile,
                 headers=self.headers,
                 environ={'REQUEST_METHOD': 'POST',
-                         'CONTENT_TYPE': self.headers['Content-Type'],
+                         'CONTENT_TYPE': self.headers['Content-Type']
                          })
 
             data = form.file.read()
