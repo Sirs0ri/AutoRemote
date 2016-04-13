@@ -192,7 +192,7 @@ def define_action_on(filetype, registry_title, command, title=None):
         k2 = _winreg.CreateKey(k1, "shell")
         k3 = _winreg.CreateKey(k2, registry_title)
         k4 = _winreg.CreateKey(k3, "command")
-        if title != None:
+        if title is not None:
             _winreg.SetValueEx(k3, None, 0, _winreg.REG_SZ, title)
         _winreg.SetValueEx(k4, None, 0, _winreg.REG_SZ, command)
         _winreg.CloseKey(k3)
@@ -876,8 +876,8 @@ class Communication(object):
                                         response,
                                         egClass)
                                     comm.handleResponse(egClass)
-                                    if (comm.responseError == None
-                                        or comm.responseError == ""):
+                                    if (comm.responseError is None or
+                                            comm.responseError == ""):
                                         # if there is no error
                                         print ("File " +
                                                originalFileName +
@@ -987,8 +987,8 @@ class Communication(object):
                         response,
                         egClass)
                     communication.handleResponse(egClass)
-                    if (communication.responseError == None
-                        or communication.responseError == "":)
+                    if (communication.responseError is None or
+                            communication.responseError == ""):
                         print "Request sent successfully"
                     else:
                         print ("Error sending request: " +
@@ -1071,7 +1071,7 @@ class Message(Request):
         self.target = replacePythonCodeAndEncode(target)
         self.version = egClass.plugin.info.version
         self.files = replacePythonCodeAndEncode(files)
-        if("|" in self.files):
+        if "|" in self.files:
             self.files = self.files.split("|")
         else:
             self.files = self.files.split(",")
@@ -1932,7 +1932,7 @@ class SendNotification(eg.ActionBase):
         return "Sending Notification"
 
     def addLine(self, label, control):
-        if(label is not None):
+        if label is not None:
             self.sizer.Add(
                 wx.StaticText(self.spanel, -1, label + ":"), 0, wx.TOP, 3)
         self.sizer.Add(control, 0, wx.EXPAND)
@@ -2156,7 +2156,7 @@ class AutoRemote(eg.PluginBase):
         RequestHandler.authString = authString
 
         if len(devices) > 0:
-            if(isinstance(devices[0], AutoRemoteDevice)):
+            if isinstance(devices[0], AutoRemoteDevice):
                 self.devices = devices
                 wx.CallAfter(self.SaveConfig, devices)
             else:
@@ -2239,7 +2239,7 @@ class AutoRemote(eg.PluginBase):
         self.server.Stop()
 
     def addLine(self, label, control, width=400):
-        if(label is not None):
+        if label is not None:
             self.boxsizer.Add(
                 wx.StaticText(self.panel, -1, label + ":"), 0, wx.TOP, 3)
         try:
@@ -2523,7 +2523,7 @@ class AutoRemoteDevice:
     def GetKey(self, shortUrl):
         if not shortUrl == '':
             try:
-                if not "http" in shortUrl:
+                if "http" not in shortUrl:
                     shortUrl = "https://" + shortUrl
                 baseUrl = (
                     "https://www.googleapis.com/urlshortener/v1/url?key=AIzaSy"
