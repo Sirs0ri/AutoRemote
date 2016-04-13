@@ -1188,7 +1188,7 @@ class SendMessage(eg.ActionBase):
         if name != "":
             self.devicesCtrl.SetStringSelection(name)
         else:
-            self.devicesCtrl.SetSelection(0);
+            self.devicesCtrl.SetSelection(0)
 
         self.deviceNameCtrl = panel.TextCtrl(manualName)
         panel.AddLine("Device Name (will override the above selected device):",
@@ -2212,7 +2212,7 @@ class AutoRemote(eg.PluginBase):
                                "AutoRemote/__init__.py")
                 filePath = DownloadFile(urlToPlugin, self.fileFolder)
                 if filePath is not None:
-                    eg.TriggerEvent("AutoRemote.Updated");
+                    eg.TriggerEvent("AutoRemote.Updated")
                     print "Downloaded remote version to " + filePath
                     UpdatePlugin(filePath)
                 else:
@@ -2224,7 +2224,7 @@ class AutoRemote(eg.PluginBase):
 
     def SetGoogleDriveRefreshToken(self, refreshToken):
         self.googleDriveRefreshToken = refreshToken
-        SaveConfig(self);
+        SaveConfig(self)
 
     def SaveConfig(self, devices):
         trItem = self.info.treeItem
