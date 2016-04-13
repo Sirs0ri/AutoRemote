@@ -17,6 +17,7 @@ import urllib
 import urllib2
 import urlparse
 from BaseHTTPServer import HTTPServer
+from os import startfile
 from os.path import getmtime
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import ThreadingMixIn
@@ -1152,7 +1153,7 @@ class Message(Request):
                     urlMatch = str(urlMatch.groups(0)[0])
                     if urlMatch:
                         print "Message has an URL. Opening: " + urlMatch
-                        from os import startfile;startfile(urlMatch)
+                        startfile(urlMatch)
         while not event.isEnded:
             time.sleep(0.05)
 
@@ -1441,7 +1442,7 @@ class RequestReturnLaterURLs(Request):
     def executeRequest(self, egClass):
         for url in self.urls:
             print "Opening " + url  + "..."
-            from os import startfile;startfile(url)
+            startfile(url)
             time.sleep(0.5)
 
 
