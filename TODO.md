@@ -3,13 +3,18 @@
 
 [ ] Make the code PEP8 compliant
     [x] newlines
-    [ ] too long lines
+    [x] too long lines
     [ ] replace "\"" with '"'
-    [ ] comments with '# '
     [ ] .format instead of +
+    [x] comments begin with '# '
+    [ ] names of methods
+    [ ] too many arguments
+    [ ] too many variables
+    [ ] Docstrings
 [ ] Comment the code
 [ ] Remove Windows-specific code
 [ ] Remove EventGhost-dependend code
+
     eg.RegisterPlugin(...)
     folder = eg.ParseString(folder)
     text = eg.ParseString(text)
@@ -38,6 +43,7 @@
     eg.document.SetIsDirty()
     eg.document.Save()
     self.updateCtrl = self.addLine(None,panel.Button("Check for updates (current version: " + eg.plugins.AutoRemote.plugin.info.version + ")"))
+
 [ ] create a working API
 [ ] Document the API
 [ ] pep8 compliance
