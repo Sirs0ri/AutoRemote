@@ -271,6 +271,7 @@ def SaveConfig(plugin):
 
 
 class ScrollPanel(scrolled.ScrolledPanel):
+
     def __init__(self, parent):
         scrolled.ScrolledPanel.__init__(self, parent, -1)
 
@@ -1038,6 +1039,7 @@ class Request(Communication):
 
         return True
 
+
 class Response(Communication):
     responseError = None
 
@@ -1046,6 +1048,7 @@ class Response(Communication):
 
     def handleResponse(self, egClass):
         pass
+
 
 class ResponseNoAction(Response):
 
@@ -1159,6 +1162,7 @@ class SendMessage(eg.ActionBase):
                  password="", target="", channel="", files="", manualName =""):
 
         manualName =  replacePythonCodeAndEncode(manualName)
+
         if manualName != "":
             for device in self.plugin.devices:
                 if device.name == manualName:
@@ -1238,6 +1242,7 @@ class SendMessage(eg.ActionBase):
     def OnBrowseFiles(self, event):
         OnBrowseFile(event, self.filesCtrl, wx.FD_MULTIPLE)
 
+
 def registerDevice(plugin, deviceToRegister):
     try:
         device = deviceByKey(plugin, deviceToRegister.id)
@@ -1251,10 +1256,12 @@ def registerDevice(plugin, deviceToRegister):
         print "Registering new Device: " + str(device)
         plugin.devices.append(device)
 
+
 class RequestSendRegistrationBase(Request):
 
     def registerDevice(self, plugin, deviceToRegister):
        registerDevice(plugin, deviceToRegister)
+
 
 class DeviceAdditionalProperties(object):
     iconUrl = None
@@ -1335,6 +1342,7 @@ class RequestGetRegistration(Request):
         publicIp = GetPublicIp(plugin)
         return ResponseGetRegistration(egClass, localip, publicIp, port)
 
+
 class ResponseGetRegistration(Response):
 
     id = None
@@ -1360,6 +1368,7 @@ class ResponseGetRegistration(Response):
        plugin = egClass.plugin
        registerDevice(plugin, self)
 
+
 class ResponseBasic(Response):
 
     result= None
@@ -1377,6 +1386,7 @@ class ResponseFileUpload(Response):
         super(ResponseFileUpload, self).__init__(egClass, egClass.plugin.dname)
         self.path = path
 
+
 class RequestVersion(Request):
 
     def __init__(self, egClass, key = ""):
@@ -1388,6 +1398,7 @@ class RequestVersion(Request):
         responseVersion = ResponseVersion(egClass)
         print "Replying with version " + responseVersion.version
         return responseVersion
+
 
 class ResponseVersion(Response):
 
@@ -1420,6 +1431,7 @@ class RequestGetLaterURLs(Request):
     def executeRequest(self, egClass):
         pass
 
+
 class RequestReturnLaterURLs(Request):
 
     urls=[]
@@ -1440,6 +1452,7 @@ def UpdatePlugin(fromFile):
     import shutil
     shutil.copy2(fromFile, toFile)
     print "Plugin updated. Please restart EventGhost to apply update."
+
 
 def GetPublicIp(plugin):
     publicIp = plugin.publicIp
@@ -1501,6 +1514,7 @@ class RegisterEventGhost(eg.ActionBase):
             if device.name == self.devicesCtrl.GetStringSelection():
                 return device
 
+
 class GetLaterUrls(eg.ActionBase):
     name = "Get Later URLs"
     description = ("Get the URLs that were stored as Send For Later on your "
@@ -1536,6 +1550,7 @@ class GetLaterUrls(eg.ActionBase):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
                 return device
+
 
 class ShowInputDialog(eg.ActionBase):
     name = "Show Input Dialog"
@@ -1600,6 +1615,7 @@ class ShowInputDialog(eg.ActionBase):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
                 return device
+
 
 class Notification(Request):
     title = None
@@ -2129,6 +2145,7 @@ class AutoRemote(eg.PluginBase):
             authString = base64.b64encode(authUsername + ':' + authPassword)
         else:
             authString = None
+
         class RequestHandler(MyHTTPRequestHandler):
             plugin = self
             environment = jinja2.Environment(loader=FileLoader())
@@ -2178,6 +2195,7 @@ class AutoRemote(eg.PluginBase):
         self.googledrive.Authorize()
     def RemoteUpdgradePluginAsync(self, event = None):
         Thread(target = self.RemoteUpdgradePlugin).start()
+
 
     def RemoteUpdgradePlugin(self):
         try:
