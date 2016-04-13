@@ -451,9 +451,9 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
             form = cgi.FieldStorage(
                 fp=self.rfile,
                 headers=self.headers,
-                environ={'REQUEST_METHOD':'POST',
-                         'CONTENT_TYPE':self.headers['Content-Type'],
-                        })
+                environ={'REQUEST_METHOD': 'POST',
+                         'CONTENT_TYPE': self.headers['Content-Type'],
+                         })
 
             data = form.file.read()
             open(finalFilePath, "wb").write(data)
@@ -469,7 +469,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         contentLength = int(self.headers.get('content-length'))
         acceptEncoding = self.headers.get('accept-encoding')
         content = self.rfile.read(contentLength).decode("utf-8")
-        communication = getCommunicationFromContent(content,self)
+        communication = getCommunicationFromContent(content, self)
         # print "Received " + str(content)
         response = communication.executeRequest(self)
         if response is None:
@@ -1917,7 +1917,7 @@ class AutoRemote(eg.PluginBase):
         self.googleDriveRefreshToken = googleDriveRefreshToken
         # for device in self.devices:
             # createSendToShortcut(device)
-        define_action_on("*", "SendToEventGhost", getEventGhostExePath() + " -event SentFromExplorer.File \"%1\"", title=windowContextMenuText)
+        define_action_on("*", "SendToEventGhost",getEventGhostExePath() + " -event SentFromExplorer.File \"%1\"", title=windowContextMenuText)
         self.googledrive = GoogleDrive(self, googleDriveRefreshToken,askForDrivePermissions)
         self.RemoteUpdgradePluginAsync()
         # print "id: " + str(self.googledrive.GetAutoRemoteFolderId())
