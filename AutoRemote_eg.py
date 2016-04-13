@@ -350,7 +350,7 @@ class MyServer(ThreadingMixIn, HTTPServer):
     #     eg.PrintError("HTTP Error")
 
 
-class AutoRemotePayload:
+class AutoRemotePayload(object):
     def __init__(self, message, params, commands, files=[], sender="",
                  plugin=None, messageObj=None):
         self.armessage = message
@@ -2491,7 +2491,7 @@ class AutoRemote(eg.PluginBase):
             return None
 
 
-class AutoRemoteDevice:
+class AutoRemoteDevice(object):
 
     name = None
     url = None
