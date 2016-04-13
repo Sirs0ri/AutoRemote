@@ -189,7 +189,7 @@ def define_action_on(filetype, registry_title, command, title=None):
 
 def createSendToShortcut(device):
 
-    sendToFolder = os.environ.get('USERPROFILE') + '\\AppData\\Roaming\\Microsoft\Windows\\SendTo\\'
+    sendToFolder = os.environ.get('USERPROFILE') + '\\AppData\\Roaming\\Microsoft\\Windows\\SendTo\\'
     path = sendToFolder + device.name.encode('utf-8') + ".lnk"
     target = getEventGhostExePath()
     wDir = parentDir(getEventGhostExePath())
