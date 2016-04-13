@@ -74,7 +74,7 @@ urlPattern = re.compile(
 
 def DownloadFile(fileUrl, folder):
     if (folder is None or
-        folder == ""):
+            folder == ""):
         # Storage Folder for files isn't set yet
         print "Please set your AutoRemote files folder in the plugin settings."
         return
@@ -467,7 +467,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
 
     def do_PUT(self):
         if (self.plugin.fileFolder == "" or
-            self.plugin.fileFolder is None):
+                self.plugin.fileFolder is None):
             print ("Can't download received files. You have to choose a "
                    "folder in the AutoRemote plugin settings first.")
         else:
@@ -584,7 +584,7 @@ class GoogleDrive(object):
         if self.askForDrivePermissions:
             print "using google drive"
             if (self.refreshToken is None or
-                self.refreshToken == ""):
+                    self.refreshToken == ""):
                 wx.LaunchDefaultBrowser(
                     ("https://accounts.google.com/o/oauth2/auth?response_type="
                      "code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdri"
@@ -628,7 +628,7 @@ class GoogleDrive(object):
 
     def GetAccessToken(self):
         if (self.accessToken is None or
-            self.IsAccessTokenExpired()):
+                self.IsAccessTokenExpired()):
             # No valid access token for Google Drive found
             # define the URL for later
             url = "https://accounts.google.com/o/oauth2/token"
@@ -1077,13 +1077,13 @@ class Message(Request):
         else:
             self.files = self.files.split(",")
         if (len(self.files) == 1 and
-            self.files[0] == ""):
+                self.files[0] == ""):
             self.files = []
 
     def DoBeforeSend(self, egClass, url, isLocalRequest):
         super(Message, self).DoBeforeSend(egClass,url, isLocalRequest)
         if (self.files is not None and
-            len(self.files) > 0):
+                len(self.files) > 0):
             # If there is a file attached
             print "Sending files in message: " + str(self.files)
             files = self.SendFiles(egClass, self.files, url, isLocalRequest)
@@ -1107,7 +1107,7 @@ class Message(Request):
                    "folder in the AutoRemote plugin settings first.")
         else:
             if (self.files is not None and
-                len(self.files) > 0):
+                    len(self.files) > 0):
                 # Request contains files
                 print "Files: " + str(self.files)
                 self.files = self.files.split(',')
@@ -1140,10 +1140,10 @@ class Message(Request):
             print desc
         event = plugin.TriggerEvent(event, payload)
         if (self.message is not None and
-            plugin.autoOpenUrls):
+                plugin.autoOpenUrls):
             # Handle the possibility that there's an URL in the message
             if (not plugin.dontOpenUrlsWithCommand or
-                not "=:=" in self.message):
+                    "=:=" not in self.message):
                 # in this case an URL should be opened
                 urlMatch = urlPattern.search(self.message)
                 if urlMatch is not None:
@@ -1457,7 +1457,7 @@ def UpdatePlugin(fromFile):
 def GetPublicIp(plugin):
     publicIp = plugin.publicIp
     if (publicIp is None or
-        publicIp == ""):
+            publicIp == ""):
         # Public IP isn't available
         from urllib2 import urlopen
         try:
@@ -2446,7 +2446,7 @@ class AutoRemote(eg.PluginBase):
     def GetDeviceFromInput(self):
         addedDeviceName = self.deviceCtrl.GetValue()
         if (self.keyCtrl.GetValue() == "" or
-            self.keyCtrl.GetValue() == "Invalid URL"):
+                self.keyCtrl.GetValue() == "Invalid URL"):
             self.deviceToAdd = AutoRemoteDevice(
                 addedDeviceName, self.urlCtrl.GetValue())
         else:
