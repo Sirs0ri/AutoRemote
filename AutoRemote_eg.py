@@ -163,7 +163,7 @@ def parentDir(path):
 
 def getEventGhostExePath():
     parentFolder = parentDir(parentDir(parentDir(os.path.realpath(__file__))))
-    return(parentFolder + "\EventGhost.exe")
+    return parentFolder + "\\EventGhost.exe"
 
 
 def define_action_on(filetype, registry_title, command, title=None):
