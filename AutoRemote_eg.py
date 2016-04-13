@@ -64,11 +64,17 @@ eg.RegisterPlugin(
 pluginVersionPattern = re.compile("version = \"([^\"]+)\"")
 pythonSubstitutionPattern = re.compile('\{[^\}]+\}')
 fileNameFromDownloadPattern = re.compile("filename=\"([^\"]+)\"")
-urlPattern = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
+urlPattern = re.compile(
+    ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)'
+    '(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+'
+    '(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|'
+    '[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 
 
 def DownloadFile(fileUrl, folder):
-    if folder is None or folder == "":
+    if (folder is None or
+        folder == ""):
+        # Storage Folder for files isn't set yet
         print "Please set your AutoRemote files folder in the plugin settings."
         return
     folder = eg.ParseString(folder)
@@ -90,7 +96,8 @@ def DownloadFile(fileUrl, folder):
         try:
             f = open(file_name, 'wb')
         except IOError:
-            print "Can't receive AutoRemote files. You need to be running in Administrator mode."
+            print("Can't receive AutoRemote files. You need to be running in "
+                  "Administrator mode.")
             return
 
         file_size = int(meta.getheaders("Content-Length")[0])
@@ -154,7 +161,8 @@ def parentDir(path):
 
 
 def getEventGhostExePath():
-    return parentDir(parentDir(parentDir(os.path.realpath(__file__)))) + "\EventGhost.exe"
+    parentFolder = parentDir(parentDir(parentDir(os.path.realpath(__file__))))
+    return(parentFolder + "\EventGhost.exe")
 
 
 def define_action_on(filetype, registry_title, command, title=None):
@@ -164,13 +172,20 @@ def define_action_on(filetype, registry_title, command, title=None):
         #       "(command: " + command + ")")
         """
         define_action_on(filetype, registry_title, command, title=None)
-            filetype: either an extension type (ex. ".txt") or one of the special values ("*" or "Directory"). Note that "*" is files only--if you'd like everything to have your action, it must be defined under "*" and "Directory"
-            registry_title: the title of the subkey, not important, but probably ought to be relevant. If title=None, this is the text that will show up in the context menu.
+            filetype: either an extension type (ex. ".txt") or one of the
+                special values ("*" or "Directory"). Note that "*" is files
+                only--if you'd like everything to have your action, it must be
+                defined under "*" and "Directory"
+            registry_title: the title of the subkey, not important, but
+                probably ought to be relevant. If title=None, this is the text
+                that will show up in the context menu.
         """
-        reg = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, "Software\\Classes", 0, _winreg.KEY_SET_VALUE)
         # all these opens/creates might not be the most efficient way to do it,
         # but it was the best I could do safely, without assuming any keys were
         # defined.
+        reg = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
+                              "Software\\Classes", 0,
+                              _winreg.KEY_SET_VALUE)
         # handily, this won't delete a key if it's already there.
         k1 = _winreg.CreateKey(reg, filetype)
         k2 = _winreg.CreateKey(k1, "shell")
@@ -189,7 +204,8 @@ def define_action_on(filetype, registry_title, command, title=None):
 
 def createSendToShortcut(device):
 
-    sendToFolder = os.environ.get('USERPROFILE') + '\\AppData\\Roaming\\Microsoft\\Windows\\SendTo\\'
+    sendToFolder = (os.environ.get('USERPROFILE') +
+                    '\\AppData\\Roaming\\Microsoft\\Windows\\SendTo\\')
     path = sendToFolder + device.name.encode('utf-8') + ".lnk"
     target = getEventGhostExePath()
     wDir = parentDir(getEventGhostExePath())
@@ -215,20 +231,25 @@ def first(list):
 
 
 def deviceByKey(plugin, key):
-    device = first([(device) for device in plugin.devices if device.key == key])
+    device = first([(device) for device
+                   in plugin.devices
+                   if device.key == key])
     return device
 
 
 def GetFileNameFromServer(contentDisposition):
     if len(contentDisposition) > 0:
-            fileNameFromServer = fileNameFromDownloadPattern.search(contentDisposition).groups(1)
+            fileNameFromServer = fileNameFromDownloadPattern \
+                                     .search(contentDisposition) \
+                                     .groups(1)
             if fileNameFromServer is not None:
                 return fileNameFromServer[0]
     return None
 
 
 def GetSavableDevices(devices):
-    return [(i.name, i.url, i.key, i.localIp, i.tryLocalIp, i.port) for i in devices]
+    return [(i.name, i.url, i.key, i.localIp, i.tryLocalIp, i.port)
+            for i in devices]
 
 
 def SaveConfig(plugin):
@@ -328,7 +349,8 @@ class MyServer(ThreadingMixIn, HTTPServer):
 
 
 class AutoRemotePayload:
-    def __init__(self, message, params, commands, files=[], sender="", plugin = None, messageObj = None):
+    def __init__(self, message, params, commands, files=[], sender="",
+                 plugin=None, messageObj=None):
         self.armessage = message
         self.arpar = params
         self.arcomm = commands
@@ -352,15 +374,20 @@ class AutoRemotePayload:
             result = ""
             if 'fallback' in self.messageObj.communication_base_params:
                 result = result + "\nThis is a redirected message."
-            result = result + "\neg.event.payload.armessage: " + repr(self.armessage)
-            if self.arpar and len(self.arpar)>0:
-                result = result + "\neg.event.payload.arpar: " + repr(self.arpar)
-            if len(self.arcomm)  > 0:
-                result = result + "\neg.event.payload.arcomm: " + repr(self.arcomm)
+            result = (result + "\neg.event.payload.armessage: " +
+                      repr(self.armessage))
+            if self.arpar and len(self.arpar) > 0:
+                result = (result + "\neg.event.payload.arpar: " +
+                          repr(self.arpar))
+            if len(self.arcomm) > 0:
+                result = (result + "\neg.event.payload.arcomm: " +
+                          repr(self.arcomm))
             if self.files is not None and len(self.files) > 0:
-                 result = result + "\neg.event.payload.files: " + str(self.files)
+                result = (result + "\neg.event.payload.files: " +
+                          str(self.files))
             if self.sender is not None:
-                 result = result + "\neg.event.payload.sender: " + str(self.sender)
+                result = (result + "\neg.event.payload.sender: " +
+                          str(self.sender))
 
         return result
 
@@ -416,7 +443,8 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
                 return True
 
         self.send_response(401)
-        self.send_header('WWW-Authenticate', 'Basic realm="%s"' % self.authRealm)
+        self.send_header('WWW-Authenticate',
+                         'Basic realm="%s"' % self.authRealm)
         return False
 
     def SendContent(self, text="OK"):
@@ -436,10 +464,13 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         self.wfile.close()
 
     def do_PUT(self):
-        if self.plugin.fileFolder == "" or self.plugin.fileFolder is None:
-            print "Can't download received files. You have to choose a folder in the AutoRemote plugin settings first."
+        if (self.plugin.fileFolder == "" or
+            self.plugin.fileFolder is None):
+            print ("Can't download received files. You have to choose a "
+                   "folder in the AutoRemote plugin settings first.")
         else:
-            fileNameFromServer = GetFileNameFromServer(self.headers.get("Content-Disposition"))
+            fileNameFromServer = GetFileNameFromServer(
+                self.headers.get("Content-Disposition"))
             if fileNameFromServer is not None:
                 file_name = fileNameFromServer
 
@@ -452,8 +483,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
                 fp=self.rfile,
                 headers=self.headers,
                 environ={'REQUEST_METHOD': 'POST',
-                         'CONTENT_TYPE': self.headers['Content-Type']
-                         })
+                         'CONTENT_TYPE': self.headers['Content-Type']})
 
             data = form.file.read()
             open(finalFilePath, "wb").write(data)
@@ -551,8 +581,16 @@ class GoogleDrive(object):
     def Authorize(self):
         if self.askForDrivePermissions:
             print "using google drive"
-            if self.refreshToken is None or self.refreshToken == "":
-                wx.LaunchDefaultBrowser("https://accounts.google.com/o/oauth2/auth?response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive&redirect_uri=http://localhost:"+str(self.plugin.port)+"&client_id=147354672683-74a5f79fdl5rnnt85mcnb0ul9k9get89.apps.googleusercontent.com&from_login=1&as=639eff90c29eec4d&pli=1&authuser=0")
+            if (self.refreshToken is None or
+                self.refreshToken == ""):
+                wx.LaunchDefaultBrowser(
+                    ("https://accounts.google.com/o/oauth2/auth?response_type="
+                     "code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdri"
+                     "ve&redirect_uri=http://localhost:") +
+                    str(self.plugin.port) +
+                    ("&client_id=147354672683-74a5f79fdl5rnnt85mcnb0ul9k9get89"
+                     ".apps.googleusercontent.com&from_login=1&as=639eff90c29e"
+                     "ec4d&pli=1&authuser=0"))
         else:
             print "not using google drive"
 
@@ -560,39 +598,65 @@ class GoogleDrive(object):
         path, dummy, remaining = path.partition("?")
         if remaining:
             if "code=" in remaining:
-                    code = remaining.split("code=")[1]
-                    url = "https://accounts.google.com/o/oauth2/token"
-                    params = {"code" : code, "client_id": "147354672683-74a5f79fdl5rnnt85mcnb0ul9k9get89.apps.googleusercontent.com", "client_secret" : "Td25ul2qYJQv7WgmKYdshLOh", "redirect_uri" : "http://localhost:" + str(self.plugin.port), "grant_type": "authorization_code"}
-                    data = urllib.urlencode(params)
-                    request = urllib2.Request(url, data, {"Content-Type" : "application/x-www-form-urlencoded"})
-                    f = urllib2.urlopen(request)
+                code = remaining.split("code=")[1]
+                # define the URL for later
+                url = "https://accounts.google.com/o/oauth2/token"
+                # define the data
+                clientID = ("147354672683-74a5f79fdl5rnnt85mcnb0ul9k9get89."
+                            "apps.googleusercontent.com")
+                redirectURI = "http://localhost:" + str(self.plugin.port)
+                params = {"code": code,
+                          "client_id": clientID,
+                          "client_secret": "Td25ul2qYJQv7WgmKYdshLOh",
+                          "redirect_uri": redirectURI,
+                          "grant_type": "authorization_code"}
+                data = urllib.urlencode(params)
+                # set the headers
+                headers = {"Content-Type": "application/x-www-form-urlencoded"}
+                request = urllib2.Request(url, data, headers)
+                f = urllib2.urlopen(request)
 
-                    response = f.read()
-                    responseJson = json.loads(response)
+                response = f.read()
+                responseJson = json.loads(response)
 
-                    self.accessToken = responseJson.get("access_token")
-                    self.SetRefreshToken(responseJson.get("refresh_token"))
+                self.accessToken = responseJson.get("access_token")
+                self.SetRefreshToken(responseJson.get("refresh_token"))
 
-                    return "Thank you. You can close this browser window now."
+                return "Thank you. You can close this browser window now."
 
     def GetAccessToken(self):
-        if self.accessToken is None or self.IsAccessTokenExpired():
+        if (self.accessToken is None or
+            self.IsAccessTokenExpired()):
+            # No valid access token for Google Drive found
+            # define the URL for later
             url = "https://accounts.google.com/o/oauth2/token"
-            params = {"refresh_token" : self.refreshToken, "client_id": "147354672683-74a5f79fdl5rnnt85mcnb0ul9k9get89.apps.googleusercontent.com", "client_secret" : "Td25ul2qYJQv7WgmKYdshLOh", "grant_type": "refresh_token"}
+            # define the data
+            clientID = ("147354672683-74a5f79fdl5rnnt85mcnb0ul9k9get89."
+                        "apps.googleusercontent.com")
+            params = {"refresh_token" : self.refreshToken,
+                      "client_id": clientID,
+                      "client_secret" : "Td25ul2qYJQv7WgmKYdshLOh",
+                      "grant_type": "refresh_token"}
             data = urllib.urlencode(params)
-            request = urllib2.Request(url, data, {"Content-Type" : "application/x-www-form-urlencoded"})
+            # set the headers
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            request = urllib2.Request(url, data, headers)
             try:
                 f = urllib2.urlopen(request)
             except IOError, e:
                 self.ResetAccessToken()
-                print "Couldn't get Google Drive Access Token. Asking for authorization..."
+                print ("Couldn't get Google Drive Access Token. "
+                       "Asking for authorization...")
                 self.Authorize()
                 raise
             response = f.read()
             responseJson = json.loads(response)
             self.accessToken = responseJson.get("access_token")
             expiresIn = responseJson.get("expires_in")
-            self.expirationDate = datetime.datetime.now() + datetime.timedelta(seconds = int(expiresIn))
+            self.expirationDate = (datetime.datetime.now() +
+                                   datetime.timedelta(
+                                       seconds = int(expiresIn)))
+                                       # TODO This as well.
 
         return self.accessToken
 
@@ -608,8 +672,11 @@ class GoogleDrive(object):
             return self.expirationDate < datetime.datetime.now()
 
     def GetAutoRemoteFolderId(self):
-        url = "https://www.googleapis.com/drive/v2/files?q=mimeType%3D'application%2Fvnd.google-apps.folder'+and+trashed%3Dfalse+and+title%3D'AutoRemote'"
-        request = urllib2.Request(url, headers= {"Authorization" : "Bearer " + self.GetAccessToken()})
+        url = ("https://www.googleapis.com/drive/v2/files?q=mimeType%3D'applic"
+               "ation%2Fvnd.google-apps.folder'+and+trashed%3Dfalse+and+title%"
+               "3D'AutoRemote'")
+        headers = {"Authorization": "Bearer " + self.GetAccessToken()}
+        request = urllib2.Request(url, headers=headers)
         f = urllib2.urlopen(request)
         response = f.read()
         responseJson = json.loads(response)
@@ -627,29 +694,40 @@ class GoogleDrive(object):
         self.InsertPermission(fileId, "", "anyone", "reader")
 
     def InsertPermission(self, fileId, value, type, role):
-        url = "https://www.googleapis.com/drive/v2/files/"+fileId+"/permissions"
+        url = ("https://www.googleapis.com/drive/v2/files/" + fileId +
+               "/permissions")
         params = {"role" : role, "type": type, "value" : value}
         data = json.dumps(params)
-        request = urllib2.Request(url, data, headers= {"Authorization" : "Bearer " + self.GetAccessToken(), "Content-Type": "application/json"})
+        headers = {"Authorization" : "Bearer " + self.GetAccessToken(),
+                   "Content-Type": "application/json"}
+        request = urllib2.Request(url, data, headers=headers)
         f = urllib2.urlopen(request)
         response = f.read()
 
-    def UploadFileToAutoRemoteFolder(self, title, description = None, mimeType = None, filePath = None, fileContent = None):
-        return self.UploadFile(title,description,mimeType, filePath, fileContent, self.GetAutoRemoteFolderId())
+    def UploadFileToAutoRemoteFolder(self, title, description = None,
+                                     mimeType = None, filePath = None,
+                                     fileContent = None):
+        return self.UploadFile(title,description,mimeType, filePath,
+                               fileContent, self.GetAutoRemoteFolderId())
 
     def UploadFolder(self, title, description = None):
         print "Creating Folder " + title
         url = "https://www.googleapis.com/drive/v2/files"
-        params = {"title": title, "description": description, "mimeType": "application/vnd.google-apps.folder" }
-        contentType = "application/json"
+        params = {"title": title,
+                  "description": description,
+                  "mimeType": "application/vnd.google-apps.folder"}
         data = json.dumps(params)
-        request = urllib2.Request(url, data, headers= {"Authorization" : "Bearer " + self.GetAccessToken(), "Content-Type": contentType})
+        contentType = "application/json"
+        headers = {"Authorization" : "Bearer " + self.GetAccessToken(),
+                   "Content-Type": contentType}
+        request = urllib2.Request(url, data, headers=headers)
         f = urllib2.urlopen(request)
         response = f.read()
         responseJson = json.loads(response)
         return responseJson["id"]
 
-    def UploadFile(self, title, description = None, mimeType = None, filePath = None, fileContent = None, parentFolder = None):
+    def UploadFile(self, title, description = None, mimeType = None,
+                   filePath = None, fileContent = None, parentFolder = None):
         title = title.encode("utf-8")
         filePath = filePath.encode("utf-8")
         print "Uploading file " + str(title)
@@ -666,12 +744,15 @@ class GoogleDrive(object):
 
         url = "https://www.googleapis.com/drive/v2/files"
 
-        params = {"title": title, "description": description, "mimeType": mimeType }
+        params = {"title": title,
+                  "description": description,
+                  "mimeType": mimeType }
         if parentFolder is not None:
             params["parents"] = [{"id": parentFolder}]
 
         if filePath is not None:
-            url = "https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart"
+            url = ("https://www.googleapis.com/upload/drive/v2/files?"
+                   "uploadType=multipart")
 
             if fileContent is None:
                 content_file = io.FileIO(filePath, 'r')
@@ -681,13 +762,24 @@ class GoogleDrive(object):
 
             params = json.dumps(params)
             contentType = 'multipart/related; boundary="'+boundary+'"'
-            data = "--" + boundary + "\nContent-Type: application/json; charset=UTF-8\n\n" + params + "\n\n" + "--" + boundary + "\nContent-Type: "+mimeType+"\n\n" + fileContent + "\n\n--" + boundary + "--"
+            data = ("--" + boundary + "\n" +
+                    "Content-Type: application/json; charset=UTF-8\n\n" +
+                    params + "\n\n" +
+                    "--" + boundary + "\n" +
+                    "Content-Type: " + mimeType + "\n\n" +
+                    fileContent + "\n\n" +
+                    "--" + boundary + "--")
 
         else:
             contentType = "application/json"
             data = json.dumps(params)
 
-        request = urllib2.Request(url, data, headers= {"Authorization" : "Bearer " + self.GetAccessToken(), "Content-Type": contentType, "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"})
+        headers = {"Authorization" : "Bearer " + self.GetAccessToken(),
+                   "Content-Type": contentType,
+                   "User-Agent": ("Mozilla/5.0 (Windows NT 6.3; WOW64) "
+                                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                  "Chrome/30.0.1599.101 Safari/537.36"}
+        request = urllib2.Request(url, data, headers=headers)
         try:
             f = urllib2.urlopen(request)
             response = f.read()
@@ -711,9 +803,11 @@ def replacePythonCodeAndEncode(text):
         text = eg.ParseString(text)
         text = text.encode('utf-8')
     except TypeError, e:
-        print "Error: {" + item + '} does not evaluate to a String. Not replacing: ' + repr(e)
+        print ("Error: {" + item + "} does not evaluate to a String. "
+               "Not replacing: " + repr(e))
     except NameError, e:
-        print "Error: {" + item + '} does not evaluate to a String. Not replacing: ' + repr(e)
+        print ("Error: {" + item + "} does not evaluate to a String. "
+               "Not replacing: " + repr(e))
     return text
 
 
@@ -725,7 +819,8 @@ class Communication(object):
 
     def __init__(self, egClass, key=""):
         self.sender = egClass.plugin.dname
-        self.communication_base_params = {"sender":egClass.plugin.dname, "type" : self.GetCommunicationType()}
+        self.communication_base_params = {"sender": egClass.plugin.dname,
+                                          "type": self.GetCommunicationType()}
         self.key = key
 
     def __str__(self):
@@ -743,7 +838,9 @@ class Communication(object):
         return json.dumps(self.__dict__)
 
     def GetParamsGCM(self):
-        return {"request":self.GetParams(), "key":self.key, "sender":self.sender}
+        return {"request": self.GetParams(),
+                "key": self.key,
+                "sender": self.sender}
 
 
     def SendFiles(self, egClass, files, url, isLocalRequest):
@@ -764,33 +861,59 @@ class Communication(object):
                             print "original file name: " + originalFileName
                             if isLocalRequest:
                                 try:
-                                    opener = urllib2.build_opener(urllib2.HTTPHandler)
-                                    request = urllib2.Request(url, data=fileContent)
-                                    request.add_header("Content-Disposition", "attachment; filename=\"" + originalFileName + "\"")
+                                    opener = urllib2.build_opener(
+                                        urllib2.HTTPHandler)
+                                    request = urllib2.Request(
+                                        url, data=fileContent)
+                                    request.add_header(
+                                        "Content-Disposition",
+                                        ("attachment; filename=\"" +
+                                         originalFileName + "\""))
                                     request.get_method = lambda: 'PUT'
                                     f = opener.open(request)
                                     response = f.read()
-                                    communication = getCommunicationFromContent(response, egClass)
-                                    communication.handleResponse(egClass)
-                                    if communication.responseError == None or communication.responseError == "":
-                                        print "File " + originalFileName + " sent"
+                                    comm = getCommunicationFromContent(
+                                        response,
+                                        egClass)
+                                    comm.handleResponse(egClass)
+                                    if (comm.responseError == None
+                                        or comm.responseError == ""):
+                                        # if there is no error
+                                        print ("File " +
+                                               originalFileName +
+                                               " sent")
                                         try:
-                                            egClass.plugin.TriggerEvent("FileSent", str(file))
+                                            egClass.plugin.TriggerEvent(
+                                                "FileSent",
+                                                str(file))
                                         except:
                                             pass
-                                        filesRemotePaths.append(communication.path)
+                                        filesRemotePaths.append(comm.path)
                                     else:
-                                        egClass.plugin.TriggerEvent("FileError", str(file))
-                                        print "Error sending file " + originalFileName + ": " + communication.responseError
+                                        egClass.plugin.TriggerEvent(
+                                            "FileError",
+                                            str(file))
+                                        print ("Error sending file " +
+                                               originalFileName +
+                                               ": " +
+                                               comm.responseError)
                                 except IOError, err:
                                     try:
-                                        egClass.plugin.TriggerEvent("FileError", str(file))
+                                        egClass.plugin.TriggerEvent(
+                                            "FileError",
+                                            str(file))
                                     except:
                                         pass
-                                    print "Couldn't send files to the device's local IP."
+                                    print ("Couldn't send files to the device'"
+                                           "s local IP.")
                             else:
                                 print "Sending file via the web"
-                                link = egClass.plugin.googledrive.UploadFileToAutoRemoteFolder(originalFileName, filePath= file, fileContent=fileContent)
+                                link = egClass.plugin \
+                                              .googledrive \
+                                              .UploadFileToAutoRemoteFolder(
+                                                  originalFileName,
+                                                  filePath=file,
+                                                  fileContent=fileContent)
                                 filesRemotePaths.append(link)
 
         except IOError, err:
@@ -805,7 +928,14 @@ class Communication(object):
         device = deviceByKey(egClass.plugin, self.key)
         if device is not None:
             myLocalIp =GetLocalIp(egClass.plugin)
-            isLocalRequest = device.tryLocalIp and device.localIp is not None and device.localIp != "" and myLocalIp is not None and myLocalIp != "" and device.localIp[:device.localIp.rfind(".")] == myLocalIp[:myLocalIp.rfind(".")]
+            deviceLocal = device.localIp[:device.localIp.rfind(".")]
+            myLocal = myLocalIp[:myLocalIp.rfind(".")]
+            isLocalRequest = (device.tryLocalIp and
+                              device.localIp is not None and
+                              device.localIp != "" and
+                              myLocalIp is not None and
+                              myLocalIp != "" and
+                              deviceLocal == myLocal)
             f = None
             if isLocalRequest:
                 try:
@@ -825,12 +955,15 @@ class Communication(object):
                         isLocalRequest = False
                 except Exception as e:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
-                    print str(exc_tb.tb_lineno) + ": Couldn't make request via local network: " + str(e)
+                    print (str(exc_tb.tb_lineno) +
+                           ": Couldn't make request via local network: " +
+                           str(e))
                     isLocalRequest = False
 
             if not isLocalRequest:
                 # url = 'http://localhost:8888/' + self.GetHttpEndpoint()
-                url = 'https://autoremotejoaomgcd.appspot.com/' + self.GetHttpEndpoint()
+                url = ('https://autoremotejoaomgcd.appspot.com/' +
+                       self.GetHttpEndpoint())
                 result = self.DoBeforeSend(egClass, url, False)
                 if result:
                     print "Calling url " + url
@@ -843,18 +976,23 @@ class Communication(object):
                         # print params
                         f = urllib2.urlopen(url,str(params))
                     except Exception as e:
-                        print "Couldn't make request via the internet: " + str(e)
+                        print ("Couldn't make request via the internet: " +
+                               str(e))
 
             # print params
             if f is not None:
                 response = f.read()
                 if isLocalRequest:
-                    communication = getCommunicationFromContent(response, egClass)
+                    communication = getCommunicationFromContent(
+                        response,
+                        egClass)
                     communication.handleResponse(egClass)
-                    if communication.responseError == None or communication.responseError == "":
+                    if (communication.responseError == None
+                        or communication.responseError == "":)
                         print "Request sent successfully"
                     else:
-                        print "Error sending request: " + communication.responseError
+                        print ("Error sending request: " +
+                               communication.responseError)
                 else:
                     print "Result from sending request: " + response
             else:
@@ -925,7 +1063,8 @@ class Message(Request):
     files=[]
     version = None
 
-    def __init__(self, egClass, key="", text="", ttl="", password="", target="", files=""):
+    def __init__(self, egClass, key="", text="", ttl="",
+                 password="", target="", files=""):
         super(Message, self).__init__(egClass, key)
         self.message = replacePythonCodeAndEncode(text)
         self.ttl = replacePythonCodeAndEncode(ttl)
@@ -937,13 +1076,16 @@ class Message(Request):
             self.files = self.files.split("|")
         else:
             self.files = self.files.split(",")
-        if len(self.files) == 1 and self.files[0] == "":
+        if (len(self.files) == 1 and
+            self.files[0] == ""):
             self.files = []
 
 
     def DoBeforeSend(self, egClass, url, isLocalRequest):
         super(Message, self).DoBeforeSend(egClass,url, isLocalRequest)
-        if self.files is not None and len(self.files) > 0:
+        if (self.files is not None and
+            len(self.files) > 0):
+            # If there is a file attached
             print "Sending files in message: " + str(self.files)
             files = self.SendFiles(egClass, self.files, url, isLocalRequest)
             if len(files) > 0:
@@ -963,12 +1105,16 @@ class Message(Request):
         # print self.message
         plugin = egClass.plugin
         if plugin.fileFolder == "":
-            print "Can't download received files. You have to choose a folder in the AutoRemote plugin settings first."
+            print ("Can't download received files. You have to choose a "
+                   "folder in the AutoRemote plugin settings first.")
         else:
-            if self.files is not None and len(self.files) > 0:
+            if (self.files is not None and
+                len(self.files) > 0):
+                # Request contains files
                 print "Files: " + str(self.files)
                 self.files = self.files.split(',')
-                self.files = [self.downloadFile(file, plugin.fileFolder) for file in self.files]
+                self.files = [self.downloadFile(file, plugin.fileFolder)
+                              for file in self.files]
 
         event = "Message"
         if self.message is not None:
@@ -988,13 +1134,19 @@ class Message(Request):
             params = []
             commands = []
             print "received empty message"
-        payload = AutoRemotePayload(self.message, params, commands,self.files, deviceByKey(plugin,self.sender), plugin, self)
+        payload = AutoRemotePayload(
+            self.message, params, commands,self.files,
+            deviceByKey(plugin,self.sender), plugin, self)
         desc = payload.GetDescription()
         if desc is not None:
             print desc
         event = plugin.TriggerEvent(event, payload)
-        if self.message is not None and plugin.autoOpenUrls:
-            if not plugin.dontOpenUrlsWithCommand or not "=:=" in self.message:
+        if (self.message is not None and
+            plugin.autoOpenUrls):
+            # Handle the possibility that there's an URL in the message
+            if (not plugin.dontOpenUrlsWithCommand or
+                not "=:=" in self.message):
+                # in this case an URL should be opened
                 urlMatch = urlPattern.search(self.message)
                 if urlMatch is not None:
                     urlMatch = str(urlMatch.groups(0)[0])
@@ -1008,25 +1160,30 @@ class Message(Request):
 class SendMessage(eg.ActionBase):
     name = "Send Message"
     description = "Send a message to your Android device"
-    def __call__(self,  name="", url="", key="", text="", ttl="", password="", target="", channel="", files="", manualName =""):
+    def __call__(self,  name="", url="", key="", text="", ttl="",
+                 password="", target="", channel="", files="", manualName =""):
 
         manualName =  replacePythonCodeAndEncode(manualName)
         if manualName != "":
             for device in self.plugin.devices:
                 if device.name == manualName:
                     key = device.key
-                    print "Found device with manual name: " + manualName +". Using this one instead."
+                    print("Found device with manual name: " + manualName + ". "
+                          "Using this one instead.")
 
         message = Message(self, key,text,ttl,password,target,files)
         message.Send(self)
 
 
 
-    def GetLabel(self,  name="", url="", key="",  message="", ttl="", password="", target="", channel="", files="", manualName =""):
+    def GetLabel(self,  name="", url="", key="",  message="", ttl="",
+                 password="", target="", channel="", files="", manualName =""):
         return "Sending " + message + " to " + name
 
 
-    def Configure(self,  name="", url="", key="",  message="", ttl="", password="", target="", channel="", files="", manualName =""):
+    def Configure(self,  name="", url="", key="",  message="",
+                  ttl="", password="", target="", channel="",
+                  files="", manualName =""):
         panel = eg.ConfigPanel(self)
 
         self.devicesCtrl = panel.Choice(0, [])
@@ -1041,7 +1198,8 @@ class SendMessage(eg.ActionBase):
             self.devicesCtrl.SetSelection(0);
 
         self.deviceNameCtrl = panel.TextCtrl(manualName)
-        panel.AddLine("Device Name (will override the above selected device):", self.deviceNameCtrl)
+        panel.AddLine("Device Name (will override the above selected device):",
+                      self.deviceNameCtrl)
 
         messageCtrl = panel.TextCtrl(message)
         panel.AddLine("Message:", messageCtrl)
@@ -1056,16 +1214,15 @@ class SendMessage(eg.ActionBase):
         panel.AddLine("Password:", passwordCtrl)
 
         self.filesCtrl = panel.TextCtrl(files)
-        panel.AddLine("Files (separate by comma or vertical bar (, or |)):", self.filesCtrl)
+        panel.AddLine("Files (separate by comma or vertical bar (, or |)):",
+                      self.filesCtrl)
 
         filesButtonCtrl = panel.Button("Browse")
         panel.AddLine("Browse Files:", filesButtonCtrl)
         filesButtonCtrl.Bind(wx.EVT_BUTTON, self.OnBrowseFiles)
 
-
         while panel.Affirmed():
             selectedDevice = self.GetSelectedDevice()
-
 
             panel.SetResult(
                 selectedDevice.name,
@@ -1079,7 +1236,6 @@ class SendMessage(eg.ActionBase):
                 self.filesCtrl.GetValue(),
                 self.deviceNameCtrl.GetValue()
             )
-
 
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
@@ -1097,7 +1253,9 @@ def registerDevice(plugin, deviceToRegister):
         device.port = deviceToRegister.port
         print "Device already registered. Updating properties: " + str(device)
     except:
-        device = AutoRemoteDevice(deviceToRegister.name, "", deviceToRegister.id, deviceToRegister.localip, True, deviceToRegister.port)
+        device = AutoRemoteDevice(
+            deviceToRegister.name, "", deviceToRegister.id,
+            deviceToRegister.localip, True, deviceToRegister.port)
         print "Registering new Device: " + str(device)
         plugin.devices.append(device)
 
@@ -1125,7 +1283,8 @@ class RequestSendRegistration(RequestSendRegistrationBase):
     haswifi = None
     additional = None
 
-    def __init__(self, egClass, key="", localip="", publicip="", port="", ttl=""):
+    def __init__(self, egClass, key="", localip="",
+                 publicip="", port="", ttl=""):
         super(RequestSendRegistration, self).__init__(egClass, key)
         self.id = egClass.plugin.dname
         self.name = egClass.plugin.dname
@@ -1161,7 +1320,8 @@ class RequestSendRegistrations(RequestSendRegistrationBase):
 
     def executeRequest(self, egClass):
         plugin = egClass.plugin
-        print "Received Multiple Registrations: " + str([device['name'] for device in self.devices])
+        print ("Received Multiple Registrations: " +
+               str([device['name'] for device in self.devices]))
         for receivedDevice in self.devices:
             device = RequestSendRegistration(egClass)
             device.FromDict(receivedDevice)
@@ -1194,7 +1354,8 @@ class ResponseGetRegistration(Response):
     haswifi = True
 
     def __init__(self, egClass, localip="", publicip="", port=""):
-        super(ResponseGetRegistration, self).__init__(egClass, egClass.plugin.dname)
+        super(ResponseGetRegistration, self) \
+            .__init__(egClass, egClass.plugin.dname)
         self.id = egClass.plugin.dname
         self.name = egClass.plugin.dname
         self.type = "eventghost"
@@ -1274,7 +1435,8 @@ class RequestReturnLaterURLs(Request):
     urls=[]
 
     def __init__(self, egClass):
-        super(RequestReturnLaterURLs, self).__init__(egClass, egClass.plugin.dname)
+        super(RequestReturnLaterURLs, self) \
+            .__init__(egClass, egClass.plugin.dname)
 
     def executeRequest(self, egClass):
         for url in self.urls:
@@ -1291,7 +1453,9 @@ def UpdatePlugin(fromFile):
 
 def GetPublicIp(plugin):
     publicIp = plugin.publicIp
-    if publicIp is None or publicIp == "":
+    if (publicIp is None or
+        publicIp == ""):
+        # Public IP isn't available
         from urllib2 import urlopen
         try:
             publicIp = json.load(urlopen('http://httpbin.org/ip'))['origin']
@@ -1302,7 +1466,9 @@ def GetPublicIp(plugin):
 
 class RegisterEventGhost(eg.ActionBase):
     name = "Register EventGhost"
-    description = "Register or refresh EventGhost info on your Android device. Recommended use is at user login and on EventGhost startup."
+    description = ("Register or refresh EventGhost info on your Android "
+                   "device. Recommended use is at user login and on "
+                   "EventGhost startup.")
 
     def __call__(self,  name="", url="",key="", ttl=""):
 
@@ -1310,7 +1476,8 @@ class RegisterEventGhost(eg.ActionBase):
         port = str(self.plugin.port)
         publicIp = GetPublicIp(self.plugin)
 
-        registration = RequestSendRegistration(self, key, localip, publicIp, port, ttl)
+        registration = RequestSendRegistration(
+            self, key, localip, publicIp, port, ttl)
         registration.Send(self)
 
 
@@ -1350,7 +1517,8 @@ class RegisterEventGhost(eg.ActionBase):
 
 class GetLaterUrls(eg.ActionBase):
     name = "Get Later URLs"
-    description = "Get the URLs that were stored as Send For Later on your Android device."
+    description = ("Get the URLs that were stored as Send For Later on your "
+                   "Android device.")
 
     def __call__(self,  name="", key=""):
 
@@ -1389,14 +1557,20 @@ class GetLaterUrls(eg.ActionBase):
 
 class ShowInputDialog(eg.ActionBase):
     name = "Show Input Dialog"
-    description = "Show an input dialog that allows you to create an EventGhost event that you can then use to trigger AutoRemote messages or notifications"
+    description = ("Show an input dialog that allows you to create an "
+                   "EventGhost event that you can then use to trigger "
+                   "AutoRemote messages or notifications")
 
-    def __call__(self,  dialogTitle="", dialogText="", textBoxText="", eventName="", useTextForEvent=False):
+    def __call__(self,  dialogTitle="", dialogText="", textBoxText="",
+                 eventName="", useTextForEvent=False):
 
 
         class MyDialog():
             def __init__(self):
-                dlg = wx.TextEntryDialog(None, eg.ParseString(dialogText),eg.ParseString(dialogTitle), textBoxText)
+                dlg = wx.TextEntryDialog(
+                    None, eg.ParseString(dialogText),
+                    eg.ParseString(dialogTitle),
+                    textBoxText)
                 if dlg.ShowModal() == wx.ID_OK:
                     response = dlg.GetValue()
                     trigger = "Input.OK." + eventName
@@ -1409,10 +1583,13 @@ class ShowInputDialog(eg.ActionBase):
         wx.CallAfter(MyDialog)
 
 
-    def GetLabel(self,  dialogTitle="", dialogText="", textBoxText="", eventName="", useTextForEvent=False):
+    def GetLabel(self, dialogTitle="", dialogText="", textBoxText="",
+                 eventName="", useTextForEvent=False):
         return "Show input dialog: " + dialogTitle
 
-    def Configure(self,  dialogTitle="Input some text", dialogText="Your text", textBoxText="", eventName="TextInput", useTextForEvent=False):
+    def Configure(self, dialogTitle="Input some text",
+                  dialogText="Your text", textBoxText="",
+                  eventName="TextInput", useTextForEvent=False):
         panel = eg.ConfigPanel(self)
 
         dialogTitleCtrl = panel.TextCtrl(dialogTitle)
@@ -1488,7 +1665,11 @@ class Notification(Request):
     def __init__(self, egClass, key=""):
         super(Notification, self).__init__(egClass, key)
 
-    def __init__(self, egClass, key="", title = "",text = "",url = "",channel = "",message = "",id = "",action = "",icon = "",led = "",ledOn = "",ledOff = "",picture = "",share = "",action1 = "",action1name = "",action2 = "",action2name = "",action3 = "",action3name = "",sound = ""):
+    def __init__(self, egClass, key="", title="", text="", url="",
+                 channel="", message="", id="", action="", icon="",
+                 led="", ledOn="", ledOff="", picture="", share="",
+                 action1="", action1name="", action2="", action2name="",
+                 action3="", action3name="", sound=""):
         super(Notification, self).__init__(egClass, key)
         self.title = replacePythonCodeAndEncode(title)
         self.text = replacePythonCodeAndEncode(text)
@@ -1529,7 +1710,8 @@ class Notification(Request):
                 result = False
 
         if len(self.picture) > 0:
-            picture = self.SendFiles(egClass,  [self.picture], url, isLocalRequest)
+            picture = self.SendFiles(
+                egClass, [self.picture], url, isLocalRequest)
             if len(picture) > 0:
                 self.picture = picture
             else:
@@ -1686,7 +1868,15 @@ class SendNotification(eg.ActionBase):
     name = "Send Notification"
     description = "Send a notification"
 
-    def __call__(self, key="",  name="", title="", text="", url="", channel="", message="", id="", action="", icon="", led="", ledOn="", ledOff="", picture="", share="", action1="", action1name="", action2="", action2name="", action3="", action3name="", sound="", statusbaricon = "", action1icon = "", action2icon = "", action3icon = "", ticker = "", dismissontouch = "", priority = "", number = "", contentInfo = "", subtext = "", maxprogress = "", progress = "", indeterminateprogress = "", actionondismiss = "", cancel = "", ttl = "", persistent = "", manualName = ""):
+    def __call__(self, key="", name="", title="", text="", url="", channel="",
+                 message="", id="", action="", icon="", led="", ledOn="",
+                 ledOff="", picture="", share="", action1="", action1name="",
+                 action2="", action2name="", action3="", action3name="",
+                 sound="", statusbaricon="", action1icon="", action2icon="",
+                 action3icon="", ticker="", dismissontouch="", priority="",
+                 number="", contentInfo="", subtext="", maxprogress="",
+                 progress="", indeterminateprogress="", actionondismiss="",
+                 cancel="", ttl="", persistent="", manualName=""):
 
         if manualName != "":
             for device in self.plugin.devices:
@@ -1694,19 +1884,60 @@ class SendNotification(eg.ActionBase):
                     key = device.key
 
         notification = Notification(self, key)
-        notification.SetTitle(title).SetText(text).SetUrl(url).SetChannel(channel)
-        notification.SetMessage(message).SetId(id).SetAction(action).SetIcon(icon).SetLed_color(led).SetLed_on(ledOn).SetLed_off(ledOff)
-        notification.SetPicture(picture).SetAction_share(share).SetAction_button1(action1).SetAction_label1(action1name).SetAction_button2(action2)
-        notification.SetAction_label2(action2name).SetAction_button3(action3).SetAction_label3(action3name).SetSound(sound)
-        notification.SetStatusbaricon(statusbaricon).SetAction1icon(action1icon).SetAction2icon(action2icon).SetAction3icon(action3icon)
-        notification.SetTicker(ticker).SetDismissontouch(dismissontouch).SetPriority(priority).SetNumber(number).SetContentInfo(contentInfo).SetSubtext(subtext)
-        notification.SetMaxprogress(maxprogress).SetProgress(progress).SetIndeterminateprogress(indeterminateprogress).SetActionondismiss(actionondismiss).SetCancel(cancel).SetPersistent(persistent)
+        notification.SetTitle(title) \
+                    .SetText(text) \
+                    .SetUrl(url) \
+                    .SetChannel(channel) \
+                    .SetMessage(message) \
+                    .SetId(id) \
+                    .SetAction(action) \
+                    .SetIcon(icon) \
+                    .SetLed_color(led) \
+                    .SetLed_on(ledOn) \
+                    .SetLed_off(ledOff) \
+                    .SetPicture(picture) \
+                    .SetAction_share(share) \
+                    .SetAction_button1(action1) \
+                    .SetAction_label1(action1name) \
+                    .SetAction_button2(action2) \
+                    .SetAction_label2(action2name) \
+                    .SetAction_button3(action3) \
+                    .SetAction_label3(action3name) \
+                    .SetSound(sound) \
+                    .SetStatusbaricon(statusbaricon) \
+                    .SetAction1icon(action1icon) \
+                    .SetAction2icon(action2icon) \
+                    .SetAction3icon(action3icon) \
+                    .SetTicker(ticker) \
+                    .SetDismissontouch(dismissontouch) \
+                    .SetPriority(priority) \
+                    .SetNumber(number) \
+                    .SetContentInfo(contentInfo) \
+                    .SetSubtext(subtext) \
+                    .SetMaxprogress(maxprogress) \
+                    .SetProgress(progress) \
+                    .SetIndeterminateprogress(indeterminateprogress) \
+                    .SetActionondismiss(actionondismiss) \
+                    .SetCancel(cancel) \
+                    .SetPersistent(persistent)
         notification.Send(self)
-        # notification = Notification(self, key,  name, title, text, url, channel, message, id, action, icon, led, ledOn, ledOff, picture, share, action1, action1name, action2, action2name, action3, action3name, sound)
+        # notification = Notification(
+        #     self, key,  name, title, text, url, channel, message, id, action,
+        #     icon, led, ledOn, ledOff, picture, share, action1, action1name,
+        #     action2, action2name, action3, action3name, sound
+        #     )
         # notification.Send()
 
 
-    def GetLabel(self, key="",  name="",title="", text="",  url="", channel="", message="", id="", action="", icon="", led="", ledOn="", ledOff="", picture="", share="", action1="", action1name="", action2="", action2name="", action3="", action3name="", sound="", statusbaricon = "", action1icon = "", action2icon = "", action3icon = "", ticker = "", dismissontouch = "", priority = "", number = "", contentInfo = "", subtext = "", maxprogress = "", progress = "", indeterminateprogress = "", actionondismiss = "", cancel = "", ttl = "", persistent = "", manualName = ""):
+    def GetLabel(self, key="", name="", title="", text="", url="", channel="",
+                 message="", id="", action="", icon="", led="", ledOn="",
+                 ledOff="", picture="", share="", action1="", action1name="",
+                 action2="", action2name="", action3="", action3name="",
+                 sound="", statusbaricon="", action1icon="", action2icon="",
+                 action3icon="", ticker="", dismissontouch="", priority="",
+                 number="", contentInfo="", subtext="", maxprogress="",
+                 progress="", indeterminateprogress="", actionondismiss="",
+                 cancel="", ttl="", persistent="", manualName=""):
         return "Sending Notification"
 
     def addLine(self, label, control):
@@ -1716,7 +1947,15 @@ class SendNotification(eg.ActionBase):
         return control
 
 
-    def Configure(self, key="",  name="",title="", text="",  url="",  channel="", message="", id="", action="", icon="", led="", ledOn="", ledOff="", picture="", share="", action1="", action1name="", action2="", action2name="", action3="", action3name="", sound="", statusbaricon = "", action1icon = "", action2icon = "", action3icon = "", ticker = "", dismissontouch = "", priority = "", number = "", contentInfo = "", subtext = "", maxprogress = "", progress = "", indeterminateprogress = "", actionondismiss = "", cancel = "", ttl = "", persistent = "", manualName = ""):
+    def Configure(self, key="", name="", title="", text="", url="", channel="",
+                  message="", id="", action="", icon="", led="", ledOn="",
+                  ledOff="", picture="", share="", action1="", action1name="",
+                  action2="", action2name="", action3="", action3name="",
+                  sound="", statusbaricon="", action1icon="", action2icon="",
+                  action3icon="", ticker="", dismissontouch="", priority="",
+                  number="", contentInfo="", subtext="", maxprogress="",
+                  progress="", indeterminateprogress="", actionondismiss="",
+                  cancel="", ttl="", persistent="", manualName=""):
         panel = eg.ConfigPanel(self)
 
         self.spanel = ScrollPanel(panel)
@@ -1734,49 +1973,95 @@ class SendNotification(eg.ActionBase):
         elif len(self.plugin.devices) > 0:
             self.devicesCtrl.SetSelection(0)
 
-        self.deviceNameCtrl = self.addLine("Device Name (will override the above selected device):",wx.TextCtrl(self.spanel, -1, manualName))
+        self.deviceNameCtrl = self.addLine(
+            "Device Name (will override the above selected device):",
+            wx.TextCtrl(self.spanel, -1, manualName))
 
-        titleCtrl = self.addLine("Title",wx.TextCtrl(self.spanel, -1, title))
-        textCtrl = self.addLine("Text", wx.TextCtrl(self.spanel, -1, text))
-        messageCtrl = self.addLine("Automatic Action", wx.TextCtrl(self.spanel, -1, message))
-        channelCtrl = self.addLine("Channel", wx.TextCtrl(self.spanel, -1, channel))
-        urlCtrl = self.addLine("Url on Touch", wx.TextCtrl(self.spanel, -1, url))
-        idCtrl = self.addLine("Id (same id will overlap)", wx.TextCtrl(self.spanel, -1, id))
-        soundCtrl = self.addLine("Sound (1 to 10)", wx.TextCtrl(self.spanel, -1, sound))
-        actionCtrl = self.addLine("Action on Touch", wx.TextCtrl(self.spanel, -1, action))
-        self.iconCtrl = self.addLine("Icon Url or local path", wx.TextCtrl(self.spanel, -1, icon))
-        iconFileButtonCtrl = self.addLine("Browse Icon File", wx.Button(self.spanel, -1, "Browse"))
-        iconFileButtonCtrl.Bind(wx.EVT_BUTTON, self.OnBrowseFileIcon)
-        ledCtrl = self.addLine("Led Color", wx.Choice(self.spanel, -1, (-1, -1), (-1, -1),  ['red', 'blue', 'green', 'black', 'white', 'gray', 'cyan', 'magenta', 'yellow', 'lightgray', 'darkgray']))
-        ledOnCtrl = self.addLine("Led On Time", wx.TextCtrl(self.spanel, -1, ledOn))
-        ledOffCtrl = self.addLine("Led Off Time", wx.TextCtrl(self.spanel, -1, ledOff))
-        self.pictureCtrl = self.addLine("Picture Url or local path", wx.TextCtrl(self.spanel, -1, picture))
-        pictureFileButtonCtrl = self.addLine("Browse Picture File", wx.Button(self.spanel, -1, "Browse"))
-        pictureFileButtonCtrl.Bind(wx.EVT_BUTTON, self.OnBrowseFilePicture)
-        shareCtrl = self.addLine("Show Share", wx.TextCtrl(self.spanel, -1, share))
-        action1Ctrl = self.addLine("Action 1", wx.TextCtrl(self.spanel, -1, action1))
-        action1nameCtrl = self.addLine("Action 1 Label", wx.TextCtrl(self.spanel, -1, action1name))
-        action2Ctrl = self.addLine("Action 2", wx.TextCtrl(self.spanel, -1, action2))
-        action2nameCtrl = self.addLine("Action 2 Label", wx.TextCtrl(self.spanel, -1, action2name))
-        action3Ctrl = self.addLine("Action 3", wx.TextCtrl(self.spanel, -1, action3))
-        action3nameCtrl = self.addLine("Action 3 Label", wx.TextCtrl(self.spanel, -1, action3name))
-        statusbariconCtrl = self.addLine("Status Bar Icon", wx.TextCtrl(self.spanel, -1, statusbaricon))
-        action1iconCtrl = self.addLine("Action 1 Icon", wx.TextCtrl(self.spanel, -1, action1icon))
-        action2iconCtrl = self.addLine("Action 2 Icon", wx.TextCtrl(self.spanel, -1, action2icon))
-        action3iconCtrl = self.addLine("Action 3 Icon", wx.TextCtrl(self.spanel, -1, action3icon))
-        tickerCtrl = self.addLine("Ticker", wx.TextCtrl(self.spanel, -1, ticker))
-        dismissontouchCtrl = self.addLine("Dismiss On Touch", wx.TextCtrl(self.spanel, -1, dismissontouch))
-        priorityCtrl = self.addLine("Priority", wx.TextCtrl(self.spanel, -1, priority))
-        numberCtrl = self.addLine("Number", wx.TextCtrl(self.spanel, -1, number))
-        contentInfoCtrl = self.addLine("Content Info", wx.TextCtrl(self.spanel, -1, contentInfo))
-        subtextCtrl = self.addLine("Sub Text", wx.TextCtrl(self.spanel, -1, subtext))
-        maxprogressCtrl = self.addLine("Max Progress", wx.TextCtrl(self.spanel, -1, maxprogress))
-        progressCtrl = self.addLine("Progress", wx.TextCtrl(self.spanel, -1, progress))
-        indeterminateprogressCtrl = self.addLine("Indeterminate Progress", wx.TextCtrl(self.spanel, -1, indeterminateprogress))
-        actionondismissCtrl = self.addLine("Action on Dismiss", wx.TextCtrl(self.spanel, -1, actionondismiss))
-        cancelCtrl = self.addLine("Cancel", wx.TextCtrl(self.spanel, -1, cancel))
-        persistentCtrl = self.addLine("Persistent", wx.TextCtrl(self.spanel, -1, persistent))
-        ttlCtrl = self.addLine("Time To Live", wx.TextCtrl(self.spanel, -1, ttl))
+        titleCtrl = self.addLine(
+            "Title",wx.TextCtrl(self.spanel, -1, title))
+        textCtrl = self.addLine(
+            "Text", wx.TextCtrl(self.spanel, -1, text))
+        messageCtrl = self.addLine(
+            "Automatic Action", wx.TextCtrl(self.spanel, -1, message))
+        channelCtrl = self.addLine(
+            "Channel", wx.TextCtrl(self.spanel, -1, channel))
+        urlCtrl = self.addLine(
+            "Url on Touch", wx.TextCtrl(self.spanel, -1, url))
+        idCtrl = self.addLine(
+            "Id (same id will overlap)", wx.TextCtrl(self.spanel, -1, id))
+        soundCtrl = self.addLine(
+            "Sound (1 to 10)", wx.TextCtrl(self.spanel, -1, sound))
+        actionCtrl = self.addLine(
+            "Action on Touch", wx.TextCtrl(self.spanel, -1, action))
+        self.iconCtrl = self.addLine(
+            "Icon Url or local path", wx.TextCtrl(self.spanel, -1, icon))
+        iconFileButtonCtrl = self.addLine(
+            "Browse Icon File", wx.Button(self.spanel, -1, "Browse"))
+        iconFileButtonCtrl.Bind(
+            wx.EVT_BUTTON, self.OnBrowseFileIcon)
+        ledCtrl = self.addLine(
+            "Led Color", wx.Choice(self.spanel, -1, (-1, -1), (-1, -1),
+            ['red', 'blue', 'green', 'black', 'white', 'gray', 'cyan',
+             'magenta', 'yellow', 'lightgray', 'darkgray']))
+        ledOnCtrl = self.addLine(
+            "Led On Time", wx.TextCtrl(self.spanel, -1, ledOn))
+        ledOffCtrl = self.addLine(
+            "Led Off Time", wx.TextCtrl(self.spanel, -1, ledOff))
+        self.pictureCtrl = self.addLine(
+            "Picture Url or local path", wx.TextCtrl(self.spanel, -1, picture))
+        pictureFileButtonCtrl = self.addLine(
+            "Browse Picture File", wx.Button(self.spanel, -1, "Browse"))
+        pictureFileButtonCtrl.Bind(
+            wx.EVT_BUTTON, self.OnBrowseFilePicture)
+        shareCtrl = self.addLine(
+            "Show Share", wx.TextCtrl(self.spanel, -1, share))
+        action1Ctrl = self.addLine(
+            "Action 1", wx.TextCtrl(self.spanel, -1, action1))
+        action1nameCtrl = self.addLine(
+            "Action 1 Label", wx.TextCtrl(self.spanel, -1, action1name))
+        action2Ctrl = self.addLine(
+            "Action 2", wx.TextCtrl(self.spanel, -1, action2))
+        action2nameCtrl = self.addLine(
+            "Action 2 Label", wx.TextCtrl(self.spanel, -1, action2name))
+        action3Ctrl = self.addLine(
+            "Action 3", wx.TextCtrl(self.spanel, -1, action3))
+        action3nameCtrl = self.addLine(
+            "Action 3 Label", wx.TextCtrl(self.spanel, -1, action3name))
+        statusbariconCtrl = self.addLine(
+            "Status Bar Icon", wx.TextCtrl(self.spanel, -1, statusbaricon))
+        action1iconCtrl = self.addLine(
+            "Action 1 Icon", wx.TextCtrl(self.spanel, -1, action1icon))
+        action2iconCtrl = self.addLine(
+            "Action 2 Icon", wx.TextCtrl(self.spanel, -1, action2icon))
+        action3iconCtrl = self.addLine(
+            "Action 3 Icon", wx.TextCtrl(self.spanel, -1, action3icon))
+        tickerCtrl = self.addLine(
+            "Ticker", wx.TextCtrl(self.spanel, -1, ticker))
+        dismissontouchCtrl = self.addLine(
+            "Dismiss On Touch", wx.TextCtrl(self.spanel, -1, dismissontouch))
+        priorityCtrl = self.addLine(
+            "Priority", wx.TextCtrl(self.spanel, -1, priority))
+        numberCtrl = self.addLine(
+            "Number", wx.TextCtrl(self.spanel, -1, number))
+        contentInfoCtrl = self.addLine(
+            "Content Info", wx.TextCtrl(self.spanel, -1, contentInfo))
+        subtextCtrl = self.addLine(
+            "Sub Text", wx.TextCtrl(self.spanel, -1, subtext))
+        maxprogressCtrl = self.addLine(
+            "Max Progress", wx.TextCtrl(self.spanel, -1, maxprogress))
+        progressCtrl = self.addLine(
+            "Progress", wx.TextCtrl(self.spanel, -1, progress))
+        indeterminateprogressCtrl = self.addLine(
+            "Indeterminate Progress",
+            wx.TextCtrl(self.spanel, -1, indeterminateprogress))
+        actionondismissCtrl = self.addLine(
+            "Action on Dismiss", wx.TextCtrl(self.spanel, -1, actionondismiss))
+        cancelCtrl = self.addLine(
+            "Cancel", wx.TextCtrl(self.spanel, -1, cancel))
+        persistentCtrl = self.addLine(
+            "Persistent", wx.TextCtrl(self.spanel, -1, persistent))
+        ttlCtrl = self.addLine(
+            "Time To Live", wx.TextCtrl(self.spanel, -1, ttl))
 
 
         while panel.Affirmed():
@@ -1861,25 +2146,13 @@ class AutoRemote(eg.PluginBase):
         self.running = False
 
 
-    def __start__(
-        self,
-        prefix=None,
-        port=1818,
-        dname="EventGhost",
-        devices=[],
-        publicIp="",
-        fileFolder="",
-        autoOpenUrls=True,
-        googleDriveRefreshToken="",
-        alernateLocalIp=False,
-        systemLogs=True,
-        windowContextMenuText="Send to EventGhost",
-        dontOpenUrlsWithCommand=True,
-        localIp="",
-        askForDrivePermissions = True,
-        authUsername="",
-        authPassword=""
-    ):
+    def __start__(self, prefix=None, port=1818, dname="EventGhost", devices=[],
+                  publicIp="", fileFolder="", autoOpenUrls=True,
+                  googleDriveRefreshToken="", alernateLocalIp=False,
+                  systemLogs=True, windowContextMenuText="Send to EventGhost",
+                  dontOpenUrlsWithCommand=True, localIp="",
+                  askForDrivePermissions = True, authUsername="",
+                  authPassword=""):
         self.info.eventPrefix = prefix
         if authUsername or authPassword:
             authString = base64.b64encode(authUsername + ':' + authPassword)
@@ -1917,12 +2190,19 @@ class AutoRemote(eg.PluginBase):
         self.googleDriveRefreshToken = googleDriveRefreshToken
         # for device in self.devices:
             # createSendToShortcut(device)
-        define_action_on("*", "SendToEventGhost",getEventGhostExePath() + " -event SentFromExplorer.File \"%1\"", title=windowContextMenuText)
-        self.googledrive = GoogleDrive(self, googleDriveRefreshToken,askForDrivePermissions)
+        define_action_on(
+            "*", "SendToEventGhost",
+            getEventGhostExePath() + " -event SentFromExplorer.File \"%1\"",
+            title=windowContextMenuText)
+        self.googledrive = GoogleDrive(
+            self, googleDriveRefreshToken, askForDrivePermissions)
         self.RemoteUpdgradePluginAsync()
         # print "id: " + str(self.googledrive.GetAutoRemoteFolderId())
 
-        # link = self.googledrive.UploadFileToAutoRemoteFolder("test", filePath = u"C:\\Users\\João\\Pictures\\Enxara com as primas\\IMG_8623.JPG")
+        # filePath = (
+        #     u"C:\\Users\\João\\Pictures\\Enxara com as primas\\IMG_8623.JPG")
+        # link = self.googledrive.UploadFileToAutoRemoteFolder(
+        #     "test", filePath=filePath)
 
         self.googledrive.Authorize()
     def RemoteUpdgradePluginAsync(self, event = None):
@@ -1930,11 +2210,18 @@ class AutoRemote(eg.PluginBase):
 
     def RemoteUpdgradePlugin(self):
         try:
-            versionFromWeb = urllib2.urlopen("https://dl.dropboxusercontent.com/u/9787157/AutoRemote/egversion").read()
-            remoteVersion = pluginVersionPattern.search(versionFromWeb).groups(1)[0]
+            urlToVersion = ("https://dl.dropboxusercontent.com/u/9787157/"
+                            "AutoRemote/egversion")
+            versionFromWeb = urllib2.urlopen(urlToVersion).read()
+            remoteVersion = pluginVersionPattern.search(versionFromWeb) \
+                                                .groups(1)[0]
             if float(remoteVersion) > float(self.info.version):
-                print "AutoRemote plugin Remote version " + remoteVersion + " > Local Version " + self.info.version  + ". Upgrading..."
-                filePath = DownloadFile("https://dl.dropboxusercontent.com/u/9787157/AutoRemote/__init__.py", self.fileFolder)
+                print ("AutoRemote plugin Remote version " + remoteVersion +
+                       " > Local Version " + self.info.version +
+                       ". Upgrading...")
+                urlToPlugin = ("https://dl.dropboxusercontent.com/u/9787157/"
+                               "AutoRemote/__init__.py")
+                filePath = DownloadFile(urlToPlugin, self.fileFolder)
                 if filePath is not None:
                     eg.TriggerEvent("AutoRemote.Updated");
                     print "Downloaded remote version to " + filePath
@@ -1964,7 +2251,8 @@ class AutoRemote(eg.PluginBase):
 
     def addLine(self, label, control, width=400):
         if(label is not None):
-            self.boxsizer.Add(wx.StaticText(self.panel,-1,label+":"),0,wx.TOP,3)
+            self.boxsizer.Add(
+                wx.StaticText(self.panel,-1,label+":"), 0, wx.TOP, 3)
         try:
             control.Size.SetWidth(width)
         except AttributeError:
@@ -1987,25 +2275,13 @@ class AutoRemote(eg.PluginBase):
     #     authPassword=""):
     #     return name
 
-    def Configure(
-        self,
-        prefix="HTTP",
-        port=1818,
-        name="EventGhost",
-        devices=[],
-        publicIp="",
-        fileFolder="",
-        autoOpenUrls=True,
-        googleDriveRefreshToken="",
-        alernateLocalIp=False,
-        systemLogs=True,
-        windowContextMenuText="Send to EventGhost",
-        dontOpenUrlsWithCommand = True,
-        localIp="",
-        askForDrivePermissions = True,
-        authUsername="",
-        authPassword=""
-    ):
+    def Configure(self, prefix="HTTP", port=1818, name="EventGhost",
+                  devices=[], publicIp="", fileFolder="", autoOpenUrls=True,
+                  googleDriveRefreshToken="", alernateLocalIp=False,
+                  systemLogs=True, windowContextMenuText="Send to EventGhost",
+                  dontOpenUrlsWithCommand=True, localIp="",
+                  askForDrivePermissions = True, authUsername="",
+                  authPassword=""):
         text = self.text
         panel = eg.ConfigPanel()
 
@@ -2016,22 +2292,51 @@ class AutoRemote(eg.PluginBase):
 
         self.addGroup("EventGhost Properties")
 
-        self.updateCtrl = self.addLine(None,panel.Button("Check for updates (current version: " + eg.plugins.AutoRemote.plugin.info.version + ")"))
+        currentVersion = eg.plugins.AutoRemote.plugin.info.version
+        self.updateCtrl = self.addLine(None, panel.Button(
+            "Check for updates (current version: " + currentVersion + ")"))
         self.updateCtrl.Bind(wx.EVT_BUTTON, self.RemoteUpdgradePluginAsync)
 
-        portCtrl = self.addLine("TCP/IP port", panel.SpinIntCtrl(port, min=1, max=65535))
-        nameCtrl = self.addLine("Name to appear on your device",  panel.TextCtrl(name))
-        publicIpCtrl = self.addLine("Your Public IP or Host Name (like a dyndns host name). Leave blank to get it automatically", panel.TextCtrl(publicIp))
-        localIpCtrl = self.addLine("Your Local IP or Host Name. Leave blank to get it automatically", panel.TextCtrl(localIp))
-        self.folderNameCtrl = self.addLine("Folder to store files in", panel.TextCtrl(fileFolder))
+        portCtrl = self.addLine(
+            "TCP/IP port", panel.SpinIntCtrl(port, min=1, max=65535))
+        nameCtrl = self.addLine(
+            "Name to appear on your device", panel.TextCtrl(name))
+        publicIpCtrl = self.addLine(
+            ("Your Public IP or Host Name (like a dyndns host name). Leave "
+             "blank to get it automatically"),
+            panel.TextCtrl(publicIp))
+        localIpCtrl = self.addLine(
+            "Your Local IP or Host Name. Leave blank to get it automatically",
+            panel.TextCtrl(localIp))
+        self.folderNameCtrl = self.addLine(
+            "Folder to store files in", panel.TextCtrl(fileFolder))
         folderButtonCtrl = self.addLine(None, panel.Button("Browse"))
         folderButtonCtrl.Bind(wx.EVT_BUTTON, self.OnBrowseFolder)
-        self.autoOpenUrlsCtrl = self.addLine(None, panel.CheckBox(autoOpenUrls,label="Automatically Open Web Pages"))
-        self.dontOpenUrlsWithCommandCtrl = self.addLine(None, panel.CheckBox(dontOpenUrlsWithCommand,label="Don't open URLs if there is a command (=:=) present"))
-        self.alternateLocalIpCtrl = self.addLine(None, panel.CheckBox(alernateLocalIp,label="Use alternative method of getting local IP. (use only if your local IP isn't correct or if you have a large delay when sending messages)"))
-        self.systemLogsCtrl = self.addLine(None, panel.CheckBox(systemLogs,label="Show all logs (disable if you want less AutoRemote logs to show up; important ones will still show.)"))
-        self.windowsContextMenuCtrl = self.addLine("Windows Context Menu Text", panel.TextCtrl(windowContextMenuText))
-        self.autoAskForDrivePermissionsCtrl = self.addLine(None, panel.CheckBox(askForDrivePermissions,label="Use Google Drive so you can easily transfer files to your Android Device"))
+        self.autoOpenUrlsCtrl = self.addLine(
+            None, panel.CheckBox(
+                autoOpenUrls, label="Automatically Open Web Pages"))
+        self.dontOpenUrlsWithCommandCtrl = self.addLine(
+            None, panel.CheckBox(
+                dontOpenUrlsWithCommand,
+                label="Don't open URLs if there is a command (=:=) present"))
+        self.alternateLocalIpCtrl = self.addLine(
+            None, panel.CheckBox(
+                alernateLocalIp,
+                label=("Use alternative method of getting local IP. (use only "
+                       "if your local IP isn't correct or if you have a large "
+                       "delay when sending messages)")))
+        self.systemLogsCtrl = self.addLine(
+            None, panel.CheckBox(
+                systemLogs,
+                label=("Show all logs (disable if you want less AutoRemote "
+                       "logs to show up; important ones will still show.)")))
+        self.windowsContextMenuCtrl = self.addLine(
+            "Windows Context Menu Text", panel.TextCtrl(windowContextMenuText))
+        self.autoAskForDrivePermissionsCtrl = self.addLine(
+            None, panel.CheckBox(
+                askForDrivePermissions,
+                label=("Use Google Drive so you can easily transfer files to "
+                       "your Android Device")))
 
 
         self.addGroup("Add Device")
@@ -2039,10 +2344,15 @@ class AutoRemote(eg.PluginBase):
         self.deviceCtrl = self.addLine("Device Name", panel.TextCtrl())
         self.deviceCtrl.Bind(wx.EVT_KILL_FOCUS, self.OnNameChanged)
 
-        self.urlCtrl = self.addLine("Device Personal URL (e.g. goo.gl/XxXxX)", panel.TextCtrl())
+        self.urlCtrl = self.addLine(
+            "Device Personal URL (e.g. goo.gl/XxXxX)",
+            panel.TextCtrl())
         self.urlCtrl.Bind(wx.EVT_KILL_FOCUS, self.OnUrlChanged)
 
-        self.keyCtrl = self.addLine("Device Key (Try to fill your personal URL first and this field should be automatically detected)", panel.TextCtrl())
+        self.keyCtrl = self.addLine(
+            ("Device Key (Try to fill your personal URL first and this field "
+             "should be automatically detected)"),
+            panel.TextCtrl())
         # self.keyCtrl.Disable()
 
         self.addDeviceCtrl = self.addLine(None,panel.Button("Add"))
@@ -2071,7 +2381,9 @@ class AutoRemote(eg.PluginBase):
         self.deviceLocalIp.Bind(wx.EVT_TEXT, self.OnDeviceLocalIpChanged)
         self.deviceLocalIp.Disable()
 
-        self.tryLocalIp = self.addLine(None, panel.CheckBox(label="Try to contact via local IP if available"))
+        self.tryLocalIp = self.addLine(
+            None, panel.CheckBox(
+                label="Try to contact via local IP if available"))
         self.tryLocalIp.Disable()
         self.tryLocalIp.Bind(wx.EVT_CHECKBOX, self.OnTryLocalIpChecked)
 
@@ -2102,7 +2414,9 @@ class AutoRemote(eg.PluginBase):
         self.addDeviceCtrl.Disable()
 
     def OnBrowseFolder(self, event):
-        dialog = wx.DirDialog(None, "Choose a directory:",style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+        dialog = wx.DirDialog(
+            None, "Choose a directory:",
+            style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
             self.folderNameCtrl.SetValue(dialog.GetPath())
         dialog.Destroy()
@@ -2143,10 +2457,14 @@ class AutoRemote(eg.PluginBase):
 
     def GetDeviceFromInput(self):
         addedDeviceName = self.deviceCtrl.GetValue()
-        if self.keyCtrl.GetValue() == "" or self.keyCtrl.GetValue() == "Invalid URL":
-            self.deviceToAdd =  AutoRemoteDevice(addedDeviceName, self.urlCtrl.GetValue())
+        if (self.keyCtrl.GetValue() == "" or
+            self.keyCtrl.GetValue() == "Invalid URL"):
+            self.deviceToAdd = AutoRemoteDevice(
+                addedDeviceName, self.urlCtrl.GetValue())
         else:
-            self.deviceToAdd = AutoRemoteDevice(addedDeviceName, self.urlCtrl.GetValue(), self.keyCtrl.GetValue())
+            self.deviceToAdd = AutoRemoteDevice(
+                addedDeviceName, self.urlCtrl.GetValue(),
+                self.keyCtrl.GetValue())
 
     def OnSelectedDeviceChanged(self, event):
         # print self.devicesCtrl.GetValue()
@@ -2192,7 +2510,8 @@ class AutoRemoteDevice:
     port = None
     tryLocalIp = False
 
-    def __init__(self, name, url, key = None, localIp = None, tryLocalIp = False, port = None):
+    def __init__(self, name, url, key=None, localIp=None,
+                 tryLocalIp=False, port=None):
         self.name = name
         self.url = url
         self.key = self.GetKey(self.url) if key is None else key
@@ -2218,7 +2537,11 @@ class AutoRemoteDevice:
             try:
                 if not "http" in shortUrl:
                     shortUrl = "https://" + shortUrl
-                result = urllib.urlopen('https://www.googleapis.com/urlshortener/v1/url?key=AIzaSyCW9fcDGiUhrqG8HKfNQJ9GuA8bxAZvUIQ&shortUrl={0}'.format(shortUrl)).read()
+                baseUrl = (
+                    "https://www.googleapis.com/urlshortener/v1/url?key=AIzaSy"
+                    "CW9fcDGiUhrqG8HKfNQJ9GuA8bxAZvUIQ&shortUrl=")
+                fullUrl = baseUrl + shortUrl
+                result = urllib.urlopen(fullUrl).read()
                 resultObj = json.loads(result)
                 url = resultObj["longUrl"]
                 parsed = urlparse.urlparse(url)
