@@ -519,7 +519,6 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
             if result is not None:
                 self.SendContent(result)
             else:
-                import urlparse
                 parsed = urlparse.urlparse(self.path)
                 # print parsed.path
                 try:
@@ -844,7 +843,6 @@ class Communication(object):
                 "sender": self.sender}
 
     def SendFiles(self, egClass, files, url, isLocalRequest):
-        import urllib2
         filesRemotePaths = []
         try:
             for aFile in files:
