@@ -125,9 +125,9 @@ def GetLocalIp(plugin):
         success = False
 
         try:
-            if plugin.alernateLocalIp :
+            if plugin.alernateLocalIp:
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                s.connect(("gmail.com",80))
+                s.connect(("gmail.com", 80))
                 localip = s.getsockname()[0]
                 # print "Alternate " + localip
                 success = True
@@ -153,7 +153,7 @@ def OnBrowseFile(event, ctrl, options=None):
         options = wx.OPEN | options
     dialog = wx.FileDialog(None, "Choose a file", "", "", "*.*", options)
     if dialog.ShowModal() == wx.ID_OK:
-        ctrl.SetValue("|".join(dialog.GetPaths()) +"|")
+        ctrl.SetValue("|".join(dialog.GetPaths()) + "|")
     dialog.Destroy()
 
 
@@ -199,7 +199,7 @@ def define_action_on(filetype, registry_title, command, title=None):
         _winreg.CloseKey(k2)
         _winreg.CloseKey(k1)
         _winreg.CloseKey(reg)
-    except  Exception, exc:
+    except Exception, exc:
         print "Can't add windows context menu: " + unicode(exc)
 
 
@@ -635,9 +635,9 @@ class GoogleDrive(object):
             # define the data
             clientID = ("147354672683-74a5f79fdl5rnnt85mcnb0ul9k9get89."
                         "apps.googleusercontent.com")
-            params = {"refresh_token" : self.refreshToken,
+            params = {"refresh_token": self.refreshToken,
                       "client_id": clientID,
-                      "client_secret" : "Td25ul2qYJQv7WgmKYdshLOh",
+                      "client_secret": "Td25ul2qYJQv7WgmKYdshLOh",
                       "grant_type": "refresh_token"}
             data = urllib.urlencode(params)
             # set the headers
@@ -695,24 +695,24 @@ class GoogleDrive(object):
     def MakePublic(self, fileId):
         self.InsertPermission(fileId, "", "anyone", "reader")
 
-    def InsertPermission(self, fileId, value, type, role):
+    def InsertPermission(self, fileId, value, kind, role):
         url = ("https://www.googleapis.com/drive/v2/files/" + fileId +
                "/permissions")
-        params = {"role" : role, "type": type, "value" : value}
+        params = {"role": role, "type": kind, "value": value}
         data = json.dumps(params)
-        headers = {"Authorization" : "Bearer " + self.GetAccessToken(),
+        headers = {"Authorization": "Bearer " + self.GetAccessToken(),
                    "Content-Type": "application/json"}
         request = urllib2.Request(url, data, headers=headers)
         f = urllib2.urlopen(request)
         response = f.read()
 
-    def UploadFileToAutoRemoteFolder(self, title, description = None,
-                                     mimeType = None, filePath = None,
-                                     fileContent = None):
-        return self.UploadFile(title,description,mimeType, filePath,
+    def UploadFileToAutoRemoteFolder(self, title, description=None,
+                                     mimeType=None, filePath=None,
+                                     fileContent=None):
+        return self.UploadFile(title, description, mimeType, filePath,
                                fileContent, self.GetAutoRemoteFolderId())
 
-    def UploadFolder(self, title, description = None):
+    def UploadFolder(self, title, description=None):
         print "Creating Folder " + title
         url = "https://www.googleapis.com/drive/v2/files"
         params = {"title": title,
@@ -720,7 +720,7 @@ class GoogleDrive(object):
                   "mimeType": "application/vnd.google-apps.folder"}
         data = json.dumps(params)
         contentType = "application/json"
-        headers = {"Authorization" : "Bearer " + self.GetAccessToken(),
+        headers = {"Authorization": "Bearer " + self.GetAccessToken(),
                    "Content-Type": contentType}
         request = urllib2.Request(url, data, headers=headers)
         f = urllib2.urlopen(request)
@@ -728,8 +728,8 @@ class GoogleDrive(object):
         responseJson = json.loads(response)
         return responseJson["id"]
 
-    def UploadFile(self, title, description = None, mimeType = None,
-                   filePath = None, fileContent = None, parentFolder = None):
+    def UploadFile(self, title, description=None, mimeType=None,
+                   filePath=None, fileContent=None, parentFolder=None):
         title = title.encode("utf-8")
         filePath = filePath.encode("utf-8")
         print "Uploading file " + str(title)
@@ -748,7 +748,7 @@ class GoogleDrive(object):
 
         params = {"title": title,
                   "description": description,
-                  "mimeType": mimeType }
+                  "mimeType": mimeType}
         if parentFolder is not None:
             params["parents"] = [{"id": parentFolder}]
 
@@ -776,7 +776,7 @@ class GoogleDrive(object):
             contentType = "application/json"
             data = json.dumps(params)
 
-        headers = {"Authorization" : "Bearer " + self.GetAccessToken(),
+        headers = {"Authorization": "Bearer " + self.GetAccessToken(),
                    "Content-Type": contentType,
                    "User-Agent": ("Mozilla/5.0 (Windows NT 6.3; WOW64) "
                                   "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -923,12 +923,12 @@ class Communication(object):
         return ",".join(filesRemotePaths)
 
     def Send(self, egClass):
-        Thread(target = self.SendSync, args=(egClass,)).start()
+        Thread(target=self.SendSync, args=(egClass,)).start()
 
     def SendSync(self, egClass):
         device = deviceByKey(egClass.plugin, self.key)
         if device is not None:
-            myLocalIp =GetLocalIp(egClass.plugin)
+            myLocalIp = GetLocalIp(egClass.plugin)
             deviceLocal = device.localIp[:device.localIp.rfind(".")]
             myLocal = myLocalIp[:myLocalIp.rfind(".")]
             isLocalRequest = (device.tryLocalIp and
@@ -951,7 +951,7 @@ class Communication(object):
                         dataToSend = str(params)
                         request = urllib2.Request(url)
                         request.add_header('Content-Type', 'application/json')
-                        f = urllib2.urlopen(request,dataToSend)
+                        f = urllib2.urlopen(request, dataToSend)
                     else:
                         isLocalRequest = False
                 except Exception as e:
@@ -975,7 +975,7 @@ class Communication(object):
                     params = urllib.urlencode(str_params_data)
                     try:
                         # print params
-                        f = urllib2.urlopen(url,str(params))
+                        f = urllib2.urlopen(url, str(params))
                     except Exception as e:
                         print ("Couldn't make request via the internet: " +
                                str(e))
@@ -1029,7 +1029,7 @@ class Request(Communication):
         return 'sendrequest'
 
     def DoBeforeSend(self, egClass, url, isLocalRequest):
-        super(Request, self).DoBeforeSend(egClass,url, isLocalRequest)
+        super(Request, self).DoBeforeSend(egClass, url, isLocalRequest)
         if self.ttl == "":
             self.ttl = "0"
         try:
@@ -1060,7 +1060,7 @@ class Message(Request):
     message = None
     password = None
     target = None
-    files=[]
+    files = []
     version = None
 
     def __init__(self, egClass, key="", text="", ttl="",
@@ -1081,7 +1081,7 @@ class Message(Request):
             self.files = []
 
     def DoBeforeSend(self, egClass, url, isLocalRequest):
-        super(Message, self).DoBeforeSend(egClass,url, isLocalRequest)
+        super(Message, self).DoBeforeSend(egClass, url, isLocalRequest)
         if (self.files is not None and
                 len(self.files) > 0):
             # If there is a file attached
@@ -1133,8 +1133,8 @@ class Message(Request):
             commands = []
             print "received empty message"
         payload = AutoRemotePayload(
-            self.message, params, commands,self.files,
-            deviceByKey(plugin,self.sender), plugin, self)
+            self.message, params, commands, self.files,
+            deviceByKey(plugin, self.sender), plugin, self)
         desc = payload.GetDescription()
         if desc is not None:
             print desc
@@ -1158,11 +1158,11 @@ class Message(Request):
 class SendMessage(eg.ActionBase):
     name = "Send Message"
     description = "Send a message to your Android device"
-    def __call__(self,  name="", url="", key="", text="", ttl="",
-                 password="", target="", channel="", files="", manualName =""):
 
-        manualName =  replacePythonCodeAndEncode(manualName)
+    def __call__(self, name="", url="", key="", text="", ttl="",
+                 password="", target="", channel="", files="", manualName=""):
 
+        manualName = replacePythonCodeAndEncode(manualName)
         if manualName != "":
             for device in self.plugin.devices:
                 if device.name == manualName:
@@ -1170,16 +1170,16 @@ class SendMessage(eg.ActionBase):
                     print("Found device with manual name: " + manualName + ". "
                           "Using this one instead.")
 
-        message = Message(self, key,text,ttl,password,target,files)
+        message = Message(self, key, text, ttl, password, target, files)
         message.Send(self)
 
-    def GetLabel(self,  name="", url="", key="",  message="", ttl="",
-                 password="", target="", channel="", files="", manualName =""):
+    def GetLabel(self, name="", url="", key="", message="", ttl="",
+                 password="", target="", channel="", files="", manualName=""):
         return "Sending " + message + " to " + name
 
-    def Configure(self,  name="", url="", key="",  message="",
+    def Configure(self, name="", url="", key="", message="",
                   ttl="", password="", target="", channel="",
-                  files="", manualName =""):
+                  files="", manualName=""):
         panel = eg.ConfigPanel(self)
 
         self.devicesCtrl = panel.Choice(0, [])
@@ -1237,7 +1237,7 @@ class SendMessage(eg.ActionBase):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
                 return device
-        return AutoRemoteDevice("","","")
+        return AutoRemoteDevice("", "", "")
 
     def OnBrowseFiles(self, event):
         OnBrowseFile(event, self.filesCtrl, wx.FD_MULTIPLE)
@@ -1331,7 +1331,7 @@ class RequestSendRegistrations(RequestSendRegistrationBase):
 
 class RequestGetRegistration(Request):
 
-    def __init__(self, egClass, key = ""):
+    def __init__(self, egClass, key=""):
         super(RequestGetRegistration, self).__init__(egClass, key)
 
     def executeRequest(self, egClass):
@@ -1371,9 +1371,9 @@ class ResponseGetRegistration(Response):
 
 class ResponseBasic(Response):
 
-    result= None
+    result = None
 
-    def __init__(self, egClass, result = ""):
+    def __init__(self, egClass, result=""):
         super(ResponseBasic, self).__init__(egClass, egClass.plugin.dname)
         self.result = result
 
@@ -1389,7 +1389,7 @@ class ResponseFileUpload(Response):
 
 class RequestVersion(Request):
 
-    def __init__(self, egClass, key = ""):
+    def __init__(self, egClass, key=""):
         super(RequestVersion, self).__init__(egClass, key)
 
     def executeRequest(self, egClass):
@@ -1411,7 +1411,7 @@ class ResponseVersion(Response):
 
 class RequestUpdatePlugin(Message):
 
-    def __init__(self, egClass, key = ""):
+    def __init__(self, egClass, key=""):
         super(RequestUpdatePlugin, self).__init__(egClass, key)
 
     def executeRequest(self, egClass):
@@ -1425,7 +1425,7 @@ class RequestUpdatePlugin(Message):
 
 class RequestGetLaterURLs(Request):
 
-    def __init__(self, egClass, key = ""):
+    def __init__(self, egClass, key=""):
         super(RequestGetLaterURLs, self).__init__(egClass, key)
 
     def executeRequest(self, egClass):
@@ -1434,7 +1434,7 @@ class RequestGetLaterURLs(Request):
 
 class RequestReturnLaterURLs(Request):
 
-    urls=[]
+    urls = []
 
     def __init__(self, egClass):
         super(RequestReturnLaterURLs, self) \
@@ -1442,7 +1442,7 @@ class RequestReturnLaterURLs(Request):
 
     def executeRequest(self, egClass):
         for url in self.urls:
-            print "Opening " + url  + "..."
+            print "Opening " + url + "..."
             startfile(url)
             time.sleep(0.5)
 
@@ -1473,7 +1473,7 @@ class RegisterEventGhost(eg.ActionBase):
                    "device. Recommended use is at user login and on "
                    "EventGhost startup.")
 
-    def __call__(self,  name="", url="",key="", ttl=""):
+    def __call__(self, name="", url="", key="", ttl=""):
 
         localip = GetLocalIp(self.plugin)
         port = str(self.plugin.port)
@@ -1483,10 +1483,10 @@ class RegisterEventGhost(eg.ActionBase):
             self, key, localip, publicIp, port, ttl)
         registration.Send(self)
 
-    def GetLabel(self,  name="", url="",key="", ttl=""):
+    def GetLabel(self, name="", url="", key="", ttl=""):
         return "Registering on " + name
 
-    def Configure(self,  name="", url="", key="", ttl=""):
+    def Configure(self, name="", url="", key="", ttl=""):
         panel = eg.ConfigPanel(self)
 
         self.devicesCtrl = panel.Choice(0, [])
@@ -1520,15 +1520,15 @@ class GetLaterUrls(eg.ActionBase):
     description = ("Get the URLs that were stored as Send For Later on your "
                    "Android device.")
 
-    def __call__(self,  name="", key=""):
+    def __call__(self, name="", key=""):
 
         request = RequestGetLaterURLs(self, key)
         request.Send(self)
 
-    def GetLabel(self,  name="", url="",key=""):
+    def GetLabel(self, name="", url="", key=""):
         return "Get Later URLs on " + name
 
-    def Configure(self,  name="", url="", key=""):
+    def Configure(self, name="", url="", key=""):
         panel = eg.ConfigPanel(self)
 
         self.devicesCtrl = panel.Choice(0, [])
@@ -1558,7 +1558,7 @@ class ShowInputDialog(eg.ActionBase):
                    "EventGhost event that you can then use to trigger "
                    "AutoRemote messages or notifications")
 
-    def __call__(self,  dialogTitle="", dialogText="", textBoxText="",
+    def __call__(self, dialogTitle="", dialogText="", textBoxText="",
                  eventName="", useTextForEvent=False):
 
         class MyDialog():
@@ -1672,11 +1672,11 @@ class Notification(Request):
         self.message = replacePythonCodeAndEncode(message)
         self.id = replacePythonCodeAndEncode(id)
         self.action = replacePythonCodeAndEncode(action)
-        self.icon = replacePythonCodeAndEncode(icon).replace("|","")
+        self.icon = replacePythonCodeAndEncode(icon).replace("|", "")
         self.led = replacePythonCodeAndEncode(led)
         self.ledOn = replacePythonCodeAndEncode(ledOn)
         self.ledOff = replacePythonCodeAndEncode(ledOff)
-        self.picture = replacePythonCodeAndEncode(picture).replace("|","")
+        self.picture = replacePythonCodeAndEncode(picture).replace("|", "")
         self.share = replacePythonCodeAndEncode(share)
         self.action1 = replacePythonCodeAndEncode(action1)
         self.action1name = replacePythonCodeAndEncode(action1name)
@@ -1693,10 +1693,10 @@ class Notification(Request):
         message.executeRequest(egClass)
 
     def DoBeforeSend(self, egClass, url, isLocalRequest):
-        super(Notification, self).DoBeforeSend(egClass,url, isLocalRequest)
+        super(Notification, self).DoBeforeSend(egClass, url, isLocalRequest)
         result = True
         if len(self.icon) > 0:
-            icon = self.SendFiles(egClass,  [self.icon], url, isLocalRequest)
+            icon = self.SendFiles(egClass, [self.icon], url, isLocalRequest)
             if len(icon) > 0:
                 self.icon = icon
             else:
@@ -1741,7 +1741,7 @@ class Notification(Request):
         return self
 
     def SetIcon(self, value):
-        self.icon = replacePythonCodeAndEncode(value).replace("|","")
+        self.icon = replacePythonCodeAndEncode(value).replace("|", "")
         return self
 
     def SetLed_color(self, value):
@@ -1757,7 +1757,7 @@ class Notification(Request):
         return self
 
     def SetPicture(self, value):
-        self.picture = replacePythonCodeAndEncode(value).replace("|","")
+        self.picture = replacePythonCodeAndEncode(value).replace("|", "")
         return self
 
     def SetAction_share(self, value):
@@ -1934,7 +1934,8 @@ class SendNotification(eg.ActionBase):
 
     def addLine(self, label, control):
         if(label is not None):
-            self.sizer.Add(wx.StaticText(self.spanel,-1,label+":"),0,wx.TOP,3)
+            self.sizer.Add(
+                wx.StaticText(self.spanel, -1, label + ":"), 0, wx.TOP, 3)
         self.sizer.Add(control, 0, wx.EXPAND)
         return control
 
@@ -1951,8 +1952,8 @@ class SendNotification(eg.ActionBase):
 
         self.spanel = ScrollPanel(panel)
         self.spanel.SetupScrolling()
-        panel.sizer.Add(self.spanel, 1, wx.ALL|wx.EXPAND)
-        self.sizer = wx.FlexGridSizer(cols = 2, vgap = 5, hgap = 10)
+        panel.sizer.Add(self.spanel, 1, wx.ALL | wx.EXPAND)
+        self.sizer = wx.FlexGridSizer(cols=2, vgap=5, hgap=10)
         self.sizer.AddGrowableCol(1)
         self.spanel.SetSizer(self.sizer)
 
@@ -1969,7 +1970,7 @@ class SendNotification(eg.ActionBase):
             wx.TextCtrl(self.spanel, -1, manualName))
 
         titleCtrl = self.addLine(
-            "Title",wx.TextCtrl(self.spanel, -1, title))
+            "Title", wx.TextCtrl(self.spanel, -1, title))
         textCtrl = self.addLine(
             "Text", wx.TextCtrl(self.spanel, -1, text))
         messageCtrl = self.addLine(
@@ -2103,7 +2104,7 @@ class SendNotification(eg.ActionBase):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
                 return device
-        return AutoRemoteDevice("","","")
+        return AutoRemoteDevice("", "", "")
 
     def OnBrowseFileIcon(self, event):
         OnBrowseFile(event, self.iconCtrl)
@@ -2138,7 +2139,7 @@ class AutoRemote(eg.PluginBase):
                   googleDriveRefreshToken="", alernateLocalIp=False,
                   systemLogs=True, windowContextMenuText="Send to EventGhost",
                   dontOpenUrlsWithCommand=True, localIp="",
-                  askForDrivePermissions = True, authUsername="",
+                  askForDrivePermissions=True, authUsername="",
                   authPassword=""):
         self.info.eventPrefix = prefix
         if authUsername or authPassword:
@@ -2193,9 +2194,9 @@ class AutoRemote(eg.PluginBase):
         #     "test", filePath=filePath)
 
         self.googledrive.Authorize()
-    def RemoteUpdgradePluginAsync(self, event = None):
-        Thread(target = self.RemoteUpdgradePlugin).start()
 
+    def RemoteUpdgradePluginAsync(self, event=None):
+        Thread(target=self.RemoteUpdgradePlugin).start()
 
     def RemoteUpdgradePlugin(self):
         try:
@@ -2241,7 +2242,7 @@ class AutoRemote(eg.PluginBase):
     def addLine(self, label, control, width=400):
         if(label is not None):
             self.boxsizer.Add(
-                wx.StaticText(self.panel,-1,label+":"), 0, wx.TOP, 3)
+                wx.StaticText(self.panel, -1, label + ":"), 0, wx.TOP, 3)
         try:
             control.Size.SetWidth(width)
         except AttributeError:
@@ -2269,7 +2270,7 @@ class AutoRemote(eg.PluginBase):
                   googleDriveRefreshToken="", alernateLocalIp=False,
                   systemLogs=True, windowContextMenuText="Send to EventGhost",
                   dontOpenUrlsWithCommand=True, localIp="",
-                  askForDrivePermissions = True, authUsername="",
+                  askForDrivePermissions=True, authUsername="",
                   authPassword=""):
         text = self.text
         panel = eg.ConfigPanel()
@@ -2277,7 +2278,7 @@ class AutoRemote(eg.PluginBase):
         self.panel = panel
         self.spanel = ScrollPanel(panel)
         self.spanel.SetupScrolling()
-        panel.sizer.Add(self.spanel, 1, wx.ALL|wx.EXPAND)
+        panel.sizer.Add(self.spanel, 1, wx.ALL | wx.EXPAND)
 
         self.addGroup("EventGhost Properties")
 
@@ -2343,7 +2344,7 @@ class AutoRemote(eg.PluginBase):
             panel.TextCtrl())
         # self.keyCtrl.Disable()
 
-        self.addDeviceCtrl = self.addLine(None,panel.Button("Add"))
+        self.addDeviceCtrl = self.addLine(None, panel.Button("Add"))
         self.addDeviceCtrl.Bind(wx.EVT_BUTTON, self.OnAddDevice)
         self.addDeviceCtrl.Disable()
 
@@ -2396,9 +2397,9 @@ class AutoRemote(eg.PluginBase):
     def OnAddDevice(self, event):
         self.GetDeviceFromInput()
         self.cdevices.append(self.deviceToAdd)
-        self.devicesCtrl.Append ( self.deviceToAdd.name )
+        self.devicesCtrl.Append(self.deviceToAdd.name)
         if self.devicesCtrl.GetValue() == -1:
-            self.devicesCtrl.SetSelection ( 0 )
+            self.devicesCtrl.SetSelection(0)
         self.addDeviceCtrl.Disable()
 
     def OnBrowseFolder(self, event):
