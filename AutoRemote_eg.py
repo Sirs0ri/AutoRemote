@@ -106,12 +106,12 @@ def DownloadFile(fileUrl, folder):
         file_size_dl = 0
         block_sz = 8192
         while True:
-            buffer = u.read(block_sz)
-            if not buffer:
+            _buffer = u.read(block_sz)
+            if not _buffer:
                 break
 
-            file_size_dl += len(buffer)
-            f.write(buffer)
+            file_size_dl += len(_buffer)
+            f.write(_buffer)
 
         f.close()
         return file_name
@@ -223,10 +223,9 @@ def createSendToShortcut(device):
     print "Created SendTo shortcut " + path
 
 
-def first(list):
+def first(aList):
     try:
-        first = next(iter(list))
-        return first
+        return next(iter(aList))
     except:
         pass
 
@@ -409,9 +408,9 @@ def getCommunicationFromContent(content, egClass):
     requestJsonString = request
     # requestJsonString = unquote_plus(request)
     requestJson = json.loads(requestJsonString)
-    type = requestJson.get("communication_base_params").get("type")
-    print "Got communication of type: " + type
-    communication = eval(type+"(egClass)")
+    commType = requestJson.get("communication_base_params").get("type")
+    print "Got communication of type: " + commType
+    communication = eval(commType + "(egClass)")
     communication.FromJson(requestJson)
     return communication
 
@@ -537,7 +536,7 @@ class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
         except:
             eg.PrintTraceback()
 
-    def log_message(self, format, *args):
+    def log_message(self, theFormat, *args):
         # suppress all messages
         pass
 
@@ -789,8 +788,8 @@ class GoogleDrive(object):
             self.ResetAccessToken()
             raise
         responseJson = json.loads(response)
-        id = responseJson["id"]
-        self.MakePublic(id)
+        ID = responseJson["id"]
+        self.MakePublic(ID)
         link = responseJson["webContentLink"]
         try:
             self.plugin.TriggerEvent("FileSent", filePath)
@@ -848,17 +847,17 @@ class Communication(object):
         import urllib2
         filesRemotePaths = []
         try:
-            for file in files:
-                if file is not None and file != "":
-                    if file.startswith("http"):
-                        filesRemotePaths.append(file)
+            for aFile in files:
+                if aFile is not None and aFile != "":
+                    if aFile.startswith("http"):
+                        filesRemotePaths.append(aFile)
                     else:
-                        print "Sending file: " + str(file)
+                        print "Sending file: " + str(aFile)
                         sent = False
-                        file = file.decode('utf-8')
-                        with io.FileIO(file, 'r') as content_file:
+                        aFile = aFile.decode('utf-8')
+                        with io.FileIO(aFile, 'r') as content_file:
                             fileContent = content_file.read()
-                            originalFileName = os.path.basename(file)
+                            originalFileName = os.path.basename(aFile)
                             print "original file name: " + originalFileName
                             if isLocalRequest:
                                 try:
@@ -886,14 +885,14 @@ class Communication(object):
                                         try:
                                             egClass.plugin.TriggerEvent(
                                                 "FileSent",
-                                                str(file))
+                                                str(aFile))
                                         except:
                                             pass
                                         filesRemotePaths.append(comm.path)
                                     else:
                                         egClass.plugin.TriggerEvent(
                                             "FileError",
-                                            str(file))
+                                            str(aFile))
                                         print ("Error sending file " +
                                                originalFileName +
                                                ": " +
@@ -902,7 +901,7 @@ class Communication(object):
                                     try:
                                         egClass.plugin.TriggerEvent(
                                             "FileError",
-                                            str(file))
+                                            str(aFile))
                                     except:
                                         pass
                                     print ("Couldn't send files to the device'"
@@ -913,7 +912,7 @@ class Communication(object):
                                               .googledrive \
                                               .UploadFileToAutoRemoteFolder(
                                                   originalFileName,
-                                                  filePath=file,
+                                                  filePath=aFile,
                                                   fileContent=fileContent)
                                 filesRemotePaths.append(link)
 
@@ -1007,11 +1006,11 @@ class Communication(object):
     def GetCommunicationType(self):
         return self.__class__.__name__
 
-    def FromJson(self, json):
-        self.__dict__ = json
+    def FromJson(self, json_data):
+        self.__dict__ = json_data
 
-    def FromDict(self, dict):
-        self.__dict__.update(dict)
+    def FromDict(self, dict_data):
+        self.__dict__.update(dict_data)
 
     def FromJsonString(self, jsonString):
         self.FromJson(json.loads(jsonString))
@@ -1111,8 +1110,8 @@ class Message(Request):
                 # Request contains files
                 print "Files: " + str(self.files)
                 self.files = self.files.split(',')
-                self.files = [self.downloadFile(file, plugin.fileFolder)
-                              for file in self.files]
+                self.files = [self.downloadFile(aFile, plugin.fileFolder)
+                              for aFile in self.files]
 
         event = "Message"
         if self.message is not None:
@@ -1862,7 +1861,7 @@ class SendNotification(eg.ActionBase):
     description = "Send a notification"
 
     def __call__(self, key="", name="", title="", text="", url="", channel="",
-                 message="", id="", action="", icon="", led="", ledOn="",
+                 message="", ID="", action="", icon="", led="", ledOn="",
                  ledOff="", picture="", share="", action1="", action1name="",
                  action2="", action2name="", action3="", action3name="",
                  sound="", statusbaricon="", action1icon="", action2icon="",
@@ -1882,7 +1881,7 @@ class SendNotification(eg.ActionBase):
                     .SetUrl(url) \
                     .SetChannel(channel) \
                     .SetMessage(message) \
-                    .SetId(id) \
+                    .SetId(ID) \
                     .SetAction(action) \
                     .SetIcon(icon) \
                     .SetLed_color(led) \
@@ -1915,14 +1914,14 @@ class SendNotification(eg.ActionBase):
                     .SetPersistent(persistent)
         notification.Send(self)
         # notification = Notification(
-        #     self, key,  name, title, text, url, channel, message, id, action,
+        #     self, key,  name, title, text, url, channel, message, ID, action,
         #     icon, led, ledOn, ledOff, picture, share, action1, action1name,
         #     action2, action2name, action3, action3name, sound
         #     )
         # notification.Send()
 
     def GetLabel(self, key="", name="", title="", text="", url="", channel="",
-                 message="", id="", action="", icon="", led="", ledOn="",
+                 message="", ID="", action="", icon="", led="", ledOn="",
                  ledOff="", picture="", share="", action1="", action1name="",
                  action2="", action2name="", action3="", action3name="",
                  sound="", statusbaricon="", action1icon="", action2icon="",
