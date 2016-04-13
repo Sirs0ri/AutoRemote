@@ -15,6 +15,7 @@
 * [ ] Remove Windows-specific code
 * [ ] Remove EventGhost-dependend code
 
+
     eg.RegisterPlugin(...)
     folder = eg.ParseString(folder)
     text = eg.ParseString(text)
