@@ -843,7 +843,6 @@ class Communication(object):
                 "key": self.key,
                 "sender": self.sender}
 
-
     def SendFiles(self, egClass, files, url, isLocalRequest):
         import urllib2
         filesRemotePaths = []
@@ -1001,7 +1000,6 @@ class Communication(object):
         else:
             print "Can't send request: device doesn't exist anymore."
 
-
     def DoBeforeSend(self, egClass, url, isLocalRequest):
         pass
 
@@ -1055,8 +1053,6 @@ class ResponseNoAction(Response):
         super(ResponseNoAction, self).__init__(egClass, key)
 
 
-
-
 class Message(Request):
     message = None
     password = None
@@ -1081,7 +1077,6 @@ class Message(Request):
             self.files[0] == ""):
             self.files = []
 
-
     def DoBeforeSend(self, egClass, url, isLocalRequest):
         super(Message, self).DoBeforeSend(egClass,url, isLocalRequest)
         if (self.files is not None and
@@ -1100,7 +1095,6 @@ class Message(Request):
 
     def downloadFile(self, fileUrl, folder):
         return DownloadFile(fileUrl, folder)
-
 
     def executeRequest(self, egClass):
         # print self.message
@@ -1175,12 +1169,9 @@ class SendMessage(eg.ActionBase):
         message = Message(self, key,text,ttl,password,target,files)
         message.Send(self)
 
-
-
     def GetLabel(self,  name="", url="", key="",  message="", ttl="",
                  password="", target="", channel="", files="", manualName =""):
         return "Sending " + message + " to " + name
-
 
     def Configure(self,  name="", url="", key="",  message="",
                   ttl="", password="", target="", channel="",
@@ -1409,7 +1400,6 @@ class ResponseVersion(Response):
 
 class RequestUpdatePlugin(Message):
 
-
     def __init__(self, egClass, key = ""):
         super(RequestUpdatePlugin, self).__init__(egClass, key)
 
@@ -1423,7 +1413,6 @@ class RequestUpdatePlugin(Message):
 
 
 class RequestGetLaterURLs(Request):
-
 
     def __init__(self, egClass, key = ""):
         super(RequestGetLaterURLs, self).__init__(egClass, key)
@@ -1481,7 +1470,6 @@ class RegisterEventGhost(eg.ActionBase):
             self, key, localip, publicIp, port, ttl)
         registration.Send(self)
 
-
     def GetLabel(self,  name="", url="",key="", ttl=""):
         return "Registering on " + name
 
@@ -1496,10 +1484,8 @@ class RegisterEventGhost(eg.ActionBase):
 
         self.devicesCtrl.SetStringSelection(name)
 
-
         ttlCtrl = panel.TextCtrl(ttl)
         panel.AddLine("Time To Live:", ttlCtrl)
-
 
         while panel.Affirmed():
             selectedDevice = self.GetSelectedDevice()
@@ -1509,7 +1495,6 @@ class RegisterEventGhost(eg.ActionBase):
                 selectedDevice.key,
                 ttlCtrl.GetValue()
             )
-
 
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
@@ -1523,10 +1508,8 @@ class GetLaterUrls(eg.ActionBase):
 
     def __call__(self,  name="", key=""):
 
-
         request = RequestGetLaterURLs(self, key)
         request.Send(self)
-
 
     def GetLabel(self,  name="", url="",key=""):
         return "Get Later URLs on " + name
@@ -1542,14 +1525,12 @@ class GetLaterUrls(eg.ActionBase):
 
         self.devicesCtrl.SetStringSelection(name)
 
-
         while panel.Affirmed():
             selectedDevice = self.GetSelectedDevice()
             panel.SetResult(
                 selectedDevice.name,
                 selectedDevice.key
             )
-
 
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
@@ -1564,7 +1545,6 @@ class ShowInputDialog(eg.ActionBase):
 
     def __call__(self,  dialogTitle="", dialogText="", textBoxText="",
                  eventName="", useTextForEvent=False):
-
 
         class MyDialog():
             def __init__(self):
@@ -1582,7 +1562,6 @@ class ShowInputDialog(eg.ActionBase):
                     eg.TriggerEvent("Input.CANCEL")
                 dlg.Destroy()
         wx.CallAfter(MyDialog)
-
 
     def GetLabel(self, dialogTitle="", dialogText="", textBoxText="",
                  eventName="", useTextForEvent=False):
@@ -1608,7 +1587,6 @@ class ShowInputDialog(eg.ActionBase):
         useTextForEventCtrl = panel.CheckBox(useTextForEvent)
         panel.AddLine("Use Input Text In Event Name:", useTextForEventCtrl)
 
-
         while panel.Affirmed():
             panel.SetResult(
                 dialogTitleCtrl.GetValue(),
@@ -1617,7 +1595,6 @@ class ShowInputDialog(eg.ActionBase):
                 eventNameCtrl.GetValue(),
                 useTextForEventCtrl.GetValue()
             )
-
 
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
@@ -1698,7 +1675,6 @@ class Notification(Request):
         message.message = self.message
         message.sender = self.sender
         message.executeRequest(egClass)
-
 
     def DoBeforeSend(self, egClass, url, isLocalRequest):
         super(Notification, self).DoBeforeSend(egClass,url, isLocalRequest)
@@ -1929,7 +1905,6 @@ class SendNotification(eg.ActionBase):
         #     )
         # notification.Send()
 
-
     def GetLabel(self, key="", name="", title="", text="", url="", channel="",
                  message="", id="", action="", icon="", led="", ledOn="",
                  ledOff="", picture="", share="", action1="", action1name="",
@@ -1946,7 +1921,6 @@ class SendNotification(eg.ActionBase):
             self.sizer.Add(wx.StaticText(self.spanel,-1,label+":"),0,wx.TOP,3)
         self.sizer.Add(control, 0, wx.EXPAND)
         return control
-
 
     def Configure(self, key="", name="", title="", text="", url="", channel="",
                   message="", id="", action="", icon="", led="", ledOn="",
@@ -2064,7 +2038,6 @@ class SendNotification(eg.ActionBase):
         ttlCtrl = self.addLine(
             "Time To Live", wx.TextCtrl(self.spanel, -1, ttl))
 
-
         while panel.Affirmed():
             selectedDevice = self.GetSelectedDevice()
             panel.SetResult(
@@ -2110,7 +2083,6 @@ class SendNotification(eg.ActionBase):
                 self.deviceNameCtrl.GetValue()
             )
 
-
     def GetSelectedDevice(self):
         for device in self.plugin.devices:
             if device.name == self.devicesCtrl.GetStringSelection():
@@ -2136,7 +2108,6 @@ class AutoRemote(eg.PluginBase):
         authUsername = "Username:"
         authPassword = "Password:"
 
-
     def __init__(self):
         self.AddEvents()
         self.AddAction(SendMessage)
@@ -2145,7 +2116,6 @@ class AutoRemote(eg.PluginBase):
         self.AddAction(GetLaterUrls)
         self.AddAction(ShowInputDialog)
         self.running = False
-
 
     def __start__(self, prefix=None, port=1818, dname="EventGhost", devices=[],
                   publicIp="", fileFolder="", autoOpenUrls=True,
@@ -2338,7 +2308,6 @@ class AutoRemote(eg.PluginBase):
                 askForDrivePermissions,
                 label=("Use Google Drive so you can easily transfer files to "
                        "your Android Device")))
-
 
         self.addGroup("Add Device")
 
