@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
+"""Plugin to integrate the communication service AutoRemote into EventGhost.
+For more infomration about AutoRemote, see: http://joaoapps.com/autoremote/
+For more information about EventGhost, see: http://www.eventghost.org/
 
+
+Author of the original Plugin: João Dias
+Rewritten to comply with the PEP8 guidelines by Maximilian Ertl
+"""
 
 import base64
 import cgi
@@ -74,6 +81,11 @@ URL_PATTERN = re.compile(
 
 
 def DownloadFile(fileUrl, folder):
+    """Download a file from a given URL to a folder. Returns nothing if
+    'folder' isn't specified or there is another error while downloading,
+    'fileUrl' if the file isn't online (ie fileUrl doesn't start with "http"),
+    and the 'folder" + the file's name (ie the full path) of the downloaded
+    file if the download succeeds."""
     if (folder is None or
             folder == ""):
         # Storage Folder for files isn't set yet
@@ -121,6 +133,7 @@ def DownloadFile(fileUrl, folder):
 
 
 def GetLocalIp(plugin):
+    """Get the device's local IP"""
 
     if plugin.localIp == "":
         success = False
@@ -148,6 +161,7 @@ def GetLocalIp(plugin):
 
 
 def OnBrowseFile(event, ctrl, options=None):
+    """Open a dialog to browse a file."""
     if options is None:
         options = wx.OPEN
     else:
@@ -205,6 +219,7 @@ def define_action_on(filetype, registry_title, command, title=None):
 
 
 def createSendToShortcut(device):
+    """Create a "Send to" shortcut in the Windiws Start menu"""
 
     sendToFolder = (os.environ.get('USERPROFILE') +
                     '\\AppData\\Roaming\\Microsoft\\Windows\\SendTo\\')
@@ -225,6 +240,7 @@ def createSendToShortcut(device):
 
 
 def first(aList):
+    """Return the first item of a list"""
     try:
         return next(iter(aList))
     except:
@@ -232,6 +248,7 @@ def first(aList):
 
 
 def deviceByKey(plugin, key):
+    """Retrieve a device from the list of all known devices based on its key"""
     device = first([(device) for device
                     in plugin.devices
                     if device.key == key])
@@ -330,6 +347,7 @@ class MyServer(ThreadingMixIn, HTTPServer):
         self.httpdThread.start()
 
     def Run(self):
+        """Run the server"""
         try:
             # Handle one request at a time until stopped
             while not self.abort:
