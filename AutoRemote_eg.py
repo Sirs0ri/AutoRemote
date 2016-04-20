@@ -8,21 +8,21 @@ import io
 import json
 import mimetypes
 import os
+from os import startfile
+from os.path import getmtime
 import posixpath
 import re
 import socket
 import sys
 import time
 import urllib
+from urllib import unquote
 import urllib2
 import urlparse
 from BaseHTTPServer import HTTPServer
-from os import startfile
-from os.path import getmtime
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import ThreadingMixIn
 from threading import Thread
-from urllib import unquote
 
 import _winreg
 import eg
