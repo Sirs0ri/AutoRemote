@@ -62,10 +62,11 @@ eg.RegisterPlugin(
           "mvqJgwA/wFagpdq+6hoCwAAAABJRU5ErkJggg==")
 )
 
-pluginVersionPattern = re.compile("version = \"([^\"]+)\"")
-pythonSubstitutionPattern = re.compile(r'\{[^\}]+\}')
-fileNameFromDownloadPattern = re.compile(r"filename=\"([^\"]+)\"")
-urlPattern = re.compile(
+PLUGIN_VERSION_PATTERN = re.compile("version = \"([^\"]+)\"")
+# TODO: PYTHON_SUBSTITUTION_PATTERN is never used
+PYTHON_SUBSTITUTION_PATTERN = re.compile(r'\{[^\}]+\}')
+FILENAME_FROM_DL_PATTERN = re.compile(r"filename=\"([^\"]+)\"")
+URL_PATTERN = re.compile(
     ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)'
     ur'(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+'
     ur'(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|'
@@ -239,7 +240,7 @@ def deviceByKey(plugin, key):
 
 def GetFileNameFromServer(contentDisposition):
     if len(contentDisposition) > 0:
-        fileNameFromServer = fileNameFromDownloadPattern \
+        fileNameFromServer = FILENAME_FROM_DL_PATTERN \
                                  .search(contentDisposition) \
                                  .groups(1)
         if fileNameFromServer is not None:
@@ -1142,7 +1143,7 @@ class Message(Request):
             if (not plugin.dontOpenUrlsWithCommand or
                     "=:=" not in self.message):
                 # in this case an URL should be opened
-                urlMatch = urlPattern.search(self.message)
+                urlMatch = URL_PATTERN.search(self.message)
                 if urlMatch is not None:
                     urlMatch = str(urlMatch.groups(0)[0])
                     if urlMatch:
@@ -2202,7 +2203,7 @@ class AutoRemote(eg.PluginBase):
             urlToVersion = ("https://dl.dropboxusercontent.com/u/9787157/"
                             "AutoRemote/egversion")
             versionFromWeb = urllib2.urlopen(urlToVersion).read()
-            remoteVersion = pluginVersionPattern.search(versionFromWeb) \
+            remoteVersion = PLUGIN_VERSION_PATTERN.search(versionFromWeb) \
                                                 .groups(1)[0]
             if float(remoteVersion) > float(self.info.version):
                 print ("AutoRemote plugin Remote version " + remoteVersion +
