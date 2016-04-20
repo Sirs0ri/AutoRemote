@@ -2222,7 +2222,7 @@ class AutoRemote(eg.PluginBase):
                             "AutoRemote/egversion")
             versionFromWeb = urllib2.urlopen(urlToVersion).read()
             remoteVersion = PLUGIN_VERSION_PATTERN.search(versionFromWeb) \
-                                                .groups(1)[0]
+                                                  .groups(1)[0]
             if float(remoteVersion) > float(self.info.version):
                 print ("AutoRemote plugin Remote version " + remoteVersion +
                        " > Local Version " + self.info.version +
