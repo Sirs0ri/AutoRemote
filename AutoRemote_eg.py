@@ -244,7 +244,7 @@ def first(aList):
     try:
         return next(iter(aList))
     except:
-        pass
+        return
 
 
 def deviceByKey(plugin, key):
