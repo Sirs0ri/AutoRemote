@@ -41,7 +41,7 @@ from win32com.client import Dispatch
 eg.RegisterPlugin(
     name="AutoRemote",
     author="joaomgcd",
-    version="1.991005",
+    version="1.991006",
     guid="{C18A174E-71E3-4C74-9A2B-8653CE9991E1}",
     description=(
         "Send and receive messages to and from AutoRemote on Android."
@@ -935,6 +935,9 @@ class Communication(object):
 
         except IOError, err:
             print "Error sending files " + str(files) + ": " + str(err)
+
+        if filesRemotePaths is not None and len(filesRemotePaths) > 0:
+            egClass.plugin.TriggerEvent("FilesSent", filesRemotePaths)
 
         return ",".join(filesRemotePaths)
 
@@ -2218,8 +2221,7 @@ class AutoRemote(eg.PluginBase):
 
     def RemoteUpdgradePlugin(self):
         try:
-            urlToVersion = ("https://dl.dropboxusercontent.com/u/9787157/"
-                            "AutoRemote/egversion")
+            urlToVersion = ("https://www.dropbox.com/s/wjl64p05ykr9ic1/egversion?dl=1")
             versionFromWeb = urllib2.urlopen(urlToVersion).read()
             remoteVersion = PLUGIN_VERSION_PATTERN.search(versionFromWeb) \
                                                   .groups(1)[0]
@@ -2227,9 +2229,8 @@ class AutoRemote(eg.PluginBase):
                 print ("AutoRemote plugin Remote version " + remoteVersion +
                        " > Local Version " + self.info.version +
                        ". Upgrading...")
-                urlToPlugin = ("https://dl.dropboxusercontent.com/u/9787157/"
-                               "AutoRemote/__init__.py")
-                filePath = DownloadFile(urlToPlugin, self.fileFolder)
+                urlToPlugin = ("https://www.dropbox.com/s/3o0f18xzwgk0ywb/__init__.py?dl=1")
+                filePath = download_file(urlToPlugin, self.fileFolder)
                 if filePath is not None:
                     eg.TriggerEvent("AutoRemote.Updated")
                     print "Downloaded remote version to " + filePath
